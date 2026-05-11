@@ -1,0 +1,14 @@
+Bulk Identity Management
+Managing users one by one is for helpdesk; automating identity is for engineers.
+
+The AZ-104 Concept: Microsoft Entra ID (formerly Azure AD), Users, and Groups.
+
+The Automation Task:
+
+1. Create a simple .csv file on your computer with three columns: FirstName, LastName, Department. Add 5 fake employees to it.
+
+2. Write an Azure PowerShell script that loops through this CSV file.
+
+3. For every row, have the script automatically create a new user in your free Entra ID tenant and assign them a temporary password.
+
+4. Have the script automatically add anyone in the "IT" department to a specific Entra ID Security Group.

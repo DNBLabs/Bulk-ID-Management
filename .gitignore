@@ -1,0 +1,29 @@
+# Secrets and local credentials (see CONTEXT.md / docs/Design/SEC.md)
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+*.p12
+*client_secret*
+*credentials*.json
+
+# Terraform / IaC local state and vars (see docs/Design/IDD.md)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+
+# PowerShell transcripts and scratch (may contain PII or passwords from apply)
+*.log
+transcript*.txt
+*.transcript.txt
+
+# OS and editor
+Thumbs.db
+Desktop.ini
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
