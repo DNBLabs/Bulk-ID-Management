@@ -12,6 +12,10 @@
 .NOTES
     Requires PowerShell 7.2+ (see BulkIdentityManagement.psd1 when present). Default CI does not call
     Microsoft Graph; the dependency exists for local and guarded apply paths.
+
+    Security: This root file performs no I/O or code execution at import time. Do not add
+    expression-from-string patterns, dynamic dot-sourcing, or interactive network calls here; keep
+    untrusted input handling in dedicated functions per CONTEXT.
 #>
 
 Export-ModuleMember -Function @()

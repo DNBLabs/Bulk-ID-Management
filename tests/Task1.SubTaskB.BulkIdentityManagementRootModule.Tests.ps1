@@ -4,11 +4,13 @@
 
 .DESCRIPTION
     Validates the repository root script module path, normative documentation pointer, empty public
-    surface on import, and absence of Microsoft Graph client calls in module source (CI scope).
+    surface on import, repository containment of the resolved path, absence of Microsoft Graph client
+    calls, and absence of high-risk execution or network surface patterns in module source (CI scope).
 #>
 
 BeforeAll {
     $repoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
+    $script:RepoRoot = $repoRoot
     $script:Psm1Path = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psm1'
     $script:Psd1Path = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psd1'
 }
@@ -17,6 +19,12 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
 
     It 'places BulkIdentityManagement.psm1 beside the module manifest when manifest exists' {
         Test-Path -LiteralPath $Psm1Path | Should -BeTrue
+        $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
+        $rootPrefix = $script:RepoRoot.TrimEnd('/', '\') + [System.IO.Path]::DirectorySeparatorChar
+        (
+            $resolvedPsm1.Path.StartsWith($rootPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+            $resolvedPsm1.Path.Equals($script:RepoRoot.TrimEnd('/', '\'), [System.StringComparison]::OrdinalIgnoreCase)
+        ) | Should -BeTrue
         if (Test-Path -LiteralPath $Psd1Path) {
             (Split-Path -Parent -Path $Psm1Path) | Should -Be (Split-Path -Parent -Path $Psd1Path)
         }
@@ -28,7 +36,8 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
     }
 
     It 'imports the root script module without exporting public commands' {
-        $moduleInfo = Import-Module -Name $Psm1Path -PassThru -Force
+        $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
+        $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
             $moduleInfo.ExportedFunctions.Count | Should -Be 0
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
@@ -43,5 +52,19 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
         $text = Get-Content -LiteralPath $Psm1Path -Raw
         $text | Should -Not -Match '(?i)Connect-MgGraph'
         $text | Should -Not -Match '(?i)Import-Module\s+Microsoft\.Graph'
+    }
+
+    It 'does not use Invoke-Expression, iex, or interactive web or process cmdlets in module source' {
+        $text = Get-Content -LiteralPath $Psm1Path -Raw
+        $dangerousPatterns = @(
+            '(?i)\bInvoke-Expression\b'
+            '(?i)\biex\b'
+            '(?i)\bInvoke-WebRequest\b'
+            '(?i)\bInvoke-RestMethod\b'
+            '(?i)\bStart-Process\b'
+        )
+        foreach ($pattern in $dangerousPatterns) {
+            $text | Should -Not -Match $pattern
+        }
     }
 }
