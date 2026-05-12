@@ -1,4 +1,5 @@
 # Default validate-only CI (CONTEXT / SEC): pwsh, PSScriptAnalyzer (Error+Warning), Pester.
+# Parallel jobs reduce wall-clock time; ci-success aggregates for a single required status check.
 # Does not call Microsoft Graph APIs. Gallery install of Microsoft.Graph runs only when a module
 # manifest exists, solely so Test-ModuleManifest can resolve RequiredModules (no Connect-MgGraph).
 name: CI
@@ -16,46 +17,58 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: pwsh
+
 jobs:
-  validate:
+  psscriptanalyzer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Show PowerShell version
-        shell: pwsh
         run: $PSVersionTable
 
-      - name: Install Pester and PSScriptAnalyzer
-        shell: pwsh
+      - name: Install PSScriptAnalyzer
         run: |
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-          Install-Module -Name Pester -MinimumVersion 5.6.0 -Scope CurrentUser -Force -SkipPublisherCheck
           Install-Module -Name PSScriptAnalyzer -MinimumVersion 1.21.0 -Scope CurrentUser -Force -SkipPublisherCheck
 
       - name: PSScriptAnalyzer (Error and Warning fail build)
-        shell: pwsh
         run: ./.github/scripts/Invoke-PSScriptAnalyzerCI.ps1
 
+  pester:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show PowerShell version
+        run: $PSVersionTable
+
+      - name: Install Pester
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name Pester -MinimumVersion 5.6.0 -Scope CurrentUser -Force -SkipPublisherCheck
+
       - name: Pester
-        shell: pwsh
         run: Invoke-Pester -Path ./tests -CI
 
+  module-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show PowerShell version
+        run: $PSVersionTable
+
       - name: Test module manifest (when module layout is present)
-        shell: pwsh
-        run: |
-          $manifest = Join-Path $PWD 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psd1'
-          if (-not (Test-Path -LiteralPath $manifest)) {
-            Write-Host 'No module manifest in repository; skipping Test-ModuleManifest and Graph gallery install.'
-            exit 0
-          }
-          $pinPath = Join-Path $PWD 'docs/tasks/MicrosoftGraph.psgallery.version.txt'
-          if (-not (Test-Path -LiteralPath $pinPath)) {
-            throw "Pin record missing at docs/tasks/MicrosoftGraph.psgallery.version.txt (required for manifest validation)."
-          }
-          $ver = (Get-Content -LiteralPath $pinPath -Raw).Trim()
-          if ($ver -notmatch '^\d+\.\d+\.\d+$') {
-            throw "Pin record must be a single numeric x.y.z line; got: $ver"
-          }
-          Install-Module -Name Microsoft.Graph -RequiredVersion $ver -Repository PSGallery -Scope CurrentUser -Force -SkipPublisherCheck
-          Test-ModuleManifest -Path $manifest -ErrorAction Stop
+        run: ./.github/scripts/Invoke-ModuleManifestCI.ps1
+
+  ci-success:
+    runs-on: ubuntu-latest
+    needs: [psscriptanalyzer, pester, module-manifest]
+    if: success()
+    steps:
+      - name: All CI gates passed
+        run: Write-Host 'PSScriptAnalyzer, Pester, and module-manifest steps completed successfully.'

@@ -3,7 +3,7 @@
     Run PSScriptAnalyzer against repository PowerShell sources for CI.
 
 .DESCRIPTION
-    Scans ./src and ./tests (when present) for Error and Warning severity findings and exits
+    Scans ./src, ./tests, and ./.github/scripts (when present) for Error and Warning severity findings and exits
     non-zero if any are reported. Aligns with CONTEXT / SEC: default CI must fail PSScriptAnalyzer
     on Error and Warning for .ps1 and .psm1 code.
 
@@ -19,7 +19,7 @@ $ErrorActionPreference = 'Stop'
 Set-Location -LiteralPath $RepoRoot
 
 $findings = @()
-foreach ($relativePath in @('src', 'tests')) {
+foreach ($relativePath in @('src', 'tests', '.github/scripts')) {
     $target = Join-Path -Path $RepoRoot -ChildPath $relativePath
     if (-not (Test-Path -LiteralPath $target)) {
         continue
