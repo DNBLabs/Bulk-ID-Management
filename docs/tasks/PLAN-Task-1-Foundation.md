@@ -99,6 +99,7 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 **Verification:**
 - [x] Manual: `Test-ModuleManifest -Path <manifest>` exits **0**. — Same as CI manifest step / local **`Invoke-ModuleManifestCI`**.
 - [x] Manual: `Import-Module` on the manifest does **not** install or call **Graph** (no network requirement for import). — **`psm1`** does not import Graph; **`Import-Module`** on manifest resolves **RequiredModules** only when Graph is already available (CI installs pin for **`Test-ModuleManifest`** only).
+- [x] Automated: Sub-task C Pester includes security regressions (empty **ScriptsToProcess** / **NestedModules** / **RequiredAssemblies** when present, no wildcard exports, no high-signal secret or private-key substrings in manifest text).
 
 **Dependencies:** **A** (version string), **B** (**RootModule** file exists)
 

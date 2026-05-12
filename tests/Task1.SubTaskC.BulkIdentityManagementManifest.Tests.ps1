@@ -6,6 +6,8 @@
     Validates manifest presence, metadata contract (PowerShell 7.2+, Core edition, CONTEXT narrative),
     exact rollup Microsoft.Graph pin aligned with docs/tasks/MicrosoftGraph.psgallery.version.txt,
     explicit empty export lists, a stable GUID, and absence of a root requirements.psd1 second authority.
+    Security-oriented checks cover empty optional load surfaces (ScriptsToProcess, NestedModules,
+    RequiredAssemblies) and reject high-signal secret material patterns in tracked manifest text.
     Test-ModuleManifest with RequiredModules resolution is enforced in CI by .github/scripts/Invoke-ModuleManifestCI.ps1.
 #>
 
@@ -85,5 +87,38 @@ Describe 'Task 1 Sub-task C - BulkIdentityManagement module manifest' {
     It 'does not introduce requirements.psd1 at the repository root' {
         $rootRequirements = Join-Path -Path $script:RepoRoot -ChildPath 'requirements.psd1'
         Test-Path -LiteralPath $rootRequirements | Should -BeFalse
+    }
+
+    It 'does not declare ScriptsToProcess, NestedModules, or RequiredAssemblies (reduces import-time execution and assembly load surface)' {
+        $data = Import-PowerShellDataFile -Path $Psd1Path
+        foreach ($key in @('ScriptsToProcess', 'NestedModules', 'RequiredAssemblies')) {
+            if ($data.ContainsKey($key)) {
+                @($data[$key]).Count | Should -Be 0 -Because "Manifest key '$key' must be empty when present"
+            }
+        }
+    }
+
+    It 'does not embed high-signal secret or private-key markers in manifest text' {
+        $raw = Get-Content -LiteralPath $Psd1Path -Raw
+        $dangerousPatterns = @(
+            '(?i)client[_-]?secret'
+            '(?i)(?:api|access)[_-]?token\s*[:=]\s*[^\s''"]+'
+            '-----BEGIN [A-Z ]*PRIVATE KEY-----'
+            '(?i)-----BEGIN OPENSSH PRIVATE KEY-----'
+        )
+        foreach ($pattern in $dangerousPatterns) {
+            $raw | Should -Not -Match $pattern
+        }
+    }
+
+    It 'does not use wildcard exports for functions, cmdlets, aliases, or variables' {
+        $data = Import-PowerShellDataFile -Path $Psd1Path
+        foreach ($key in @('FunctionsToExport', 'CmdletsToExport', 'AliasesToExport', 'VariablesToExport')) {
+            if ($data.ContainsKey($key)) {
+                foreach ($entry in @($data[$key])) {
+                    [string] $entry | Should -Not -Match '\*' -Because "Wildcard exports in '$key' widen accidental public surface"
+                }
+            }
+        }
     }
 }
