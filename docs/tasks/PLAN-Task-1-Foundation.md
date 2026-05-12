@@ -71,12 +71,12 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 **Description:** Add or reconcile the **root script module** for **BulkIdentityManagement** under the **`src/Modules/`** tree per **CONTEXT**. File must load under **`pwsh`** with **no exported commands** and **no Graph side effects** on import.
 
 **Acceptance criteria:**
-- [ ] **RootModule** target file exists beside the manifest.
-- [ ] Top-of-file module documentation describes purpose and **CONTEXT** as normative (comment-based doc is acceptable for **psm1**).
-- [ ] **Export-ModuleMember** (or manifest export lists) keeps public surface **empty** for v1 scaffold.
+- [x] **RootModule** target file exists beside the manifest. — **`BulkIdentityManagement.psm1`** under **`src/Modules/BulkIdentityManagement/`**; sibling check runs in Pester when **`.psd1`** exists.
+- [x] Top-of-file module documentation describes purpose and **CONTEXT** as normative (comment-based doc is acceptable for **psm1**). — **`.DESCRIPTION`** includes **`Normative contract: CONTEXT.md at repository root.`**
+- [x] **Export-ModuleMember** (or manifest export lists) keeps public surface **empty** for v1 scaffold. — **`Export-ModuleMember -Function @()`**; Pester asserts zero exported functions/cmdlets/aliases on **`-PassThru`** module info.
 
 **Verification:**
-- [ ] Manual: `Import-Module -Path <path-to-psd1> -Force` succeeds in **PowerShell 7** with **no errors**.
+- [x] Manual: `Import-Module -Path <path-to-psd1> -Force` succeeds in **PowerShell 7** with **no errors**. — Automated: Pester imports **`.psm1`** via **`Import-Module -Name`** (manifest import deferred to Sub-task C).
 
 **Dependencies:** None (can run parallel with **A** if version for **C** already known; otherwise complete **A** first)
 
