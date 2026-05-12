@@ -1,7 +1,10 @@
 # Default validate-only CI (CONTEXT / SEC): pwsh, PSScriptAnalyzer (Error+Warning), Pester.
+# Quality gate mapping (this repo is PowerShell-only; no Node build/typecheck/npm audit):
+#   Lint/static analysis -> PSScriptAnalyzer (src, tests, .github/scripts)
+#   Unit tests          -> Pester (-CI writes testResults.xml; uploaded on failure)
+#   Manifest/metadata   -> Invoke-ModuleManifestCI (Test-ModuleManifest; gallery install of
+#                          pinned Microsoft.Graph only to resolve RequiredModules; no Connect-MgGraph)
 # Parallel jobs reduce wall-clock time; ci-success aggregates for a single required status check.
-# Does not call Microsoft Graph APIs. Gallery install of Microsoft.Graph runs only when a module
-# manifest exists, solely so Test-ModuleManifest can resolve RequiredModules (no Connect-MgGraph).
 name: CI
 
 on:
@@ -12,6 +15,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -24,6 +28,7 @@ defaults:
 jobs:
   psscriptanalyzer:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -40,6 +45,7 @@ jobs:
 
   pester:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -54,21 +60,36 @@ jobs:
       - name: Pester
         run: Invoke-Pester -Path ./tests -CI
 
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: pester-testresults
+          path: testResults.xml
+          if-no-files-found: ignore
+
   module-manifest:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
       - name: Show PowerShell version
         run: $PSVersionTable
 
+      - uses: actions/cache@v4
+        id: cache-psgallery-modules
+        with:
+          path: ~/.local/share/powershell/Modules
+          key: ${{ runner.os }}-psgallery-modules-${{ hashFiles('docs/tasks/MicrosoftGraph.psgallery.version.txt', '.github/scripts/Invoke-ModuleManifestCI.ps1') }}
+
       - name: Test module manifest (when module layout is present)
         run: ./.github/scripts/Invoke-ModuleManifestCI.ps1
 
   ci-success:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: [psscriptanalyzer, pester, module-manifest]
     if: success()
     steps:
       - name: All CI gates passed
-        run: Write-Host 'PSScriptAnalyzer, Pester, and module-manifest steps completed successfully.'
+        run: Write-Output 'PSScriptAnalyzer, Pester, and module-manifest steps completed successfully.'
