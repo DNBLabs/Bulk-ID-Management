@@ -19,6 +19,7 @@
 *.log
 transcript*.txt
 *.transcript.txt
+testResults.xml
 
 # OS and editor
 Thumbs.db

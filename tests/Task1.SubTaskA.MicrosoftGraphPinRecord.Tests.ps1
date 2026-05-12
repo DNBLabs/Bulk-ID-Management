@@ -25,7 +25,7 @@ BeforeAll {
     $script:RepoRootCanonical = $repoRoot
 }
 
-Describe 'Task 1 Sub-task A — Microsoft.Graph PSGallery pin record' {
+Describe 'Task 1 Sub-task A - Microsoft.Graph PSGallery pin record' {
 
     It 'commits a pin record file under docs/tasks' {
         Test-Path -LiteralPath $PinRecordPath | Should -BeTrue
