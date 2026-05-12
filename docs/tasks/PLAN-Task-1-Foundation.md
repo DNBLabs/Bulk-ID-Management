@@ -92,13 +92,13 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 **Description:** Add or reconcile the **module manifest**: valid **GUID**, **ModuleVersion** (e.g. **0.1.0** pre-release story per PRD), **PowerShellVersion** **7.2**, **CompatiblePSEditions** **Core**, description referencing **7.2+** / **7.4+ preferred** and **CONTEXT**, explicit empty export arrays, **`RequiredModules`** entry for **Microsoft.Graph** at the **exact** version from **A** using a **non-drifting** version specification.
 
 **Acceptance criteria:**
-- [ ] **`Test-ModuleManifest`** succeeds on the manifest path.
-- [ ] **`RequiredModules`** lists **Microsoft.Graph** only (rollup) at exact pin per **CONTEXT** / PRD.
-- [ ] No root **`requirements.psd1`** introduced as a second authority.
+- [x] **`Test-ModuleManifest`** succeeds on the manifest path. — **`Invoke-ModuleManifestCI.ps1`** + local **`Test-ModuleManifest`** after pinned **`Microsoft.Graph`** install.
+- [x] **`RequiredModules`** lists **Microsoft.Graph** only (rollup) at exact pin per **CONTEXT** / PRD. — **`ModuleVersion`** + **`MaximumVersion`** both **`2.37.0`** (from pin file); Pester **`tests/Task1.SubTaskC.BulkIdentityManagementManifest.Tests.ps1`**.
+- [x] No root **`requirements.psd1`** introduced as a second authority. — Asserted in Sub-task C Pester; repo search shows none.
 
 **Verification:**
-- [ ] Manual: `Test-ModuleManifest -Path <manifest>` exits **0**.
-- [ ] Manual: `Import-Module` on the manifest does **not** install or call **Graph** (no network requirement for import).
+- [x] Manual: `Test-ModuleManifest -Path <manifest>` exits **0**. — Same as CI manifest step / local **`Invoke-ModuleManifestCI`**.
+- [x] Manual: `Import-Module` on the manifest does **not** install or call **Graph** (no network requirement for import). — **`psm1`** does not import Graph; **`Import-Module`** on manifest resolves **RequiredModules** only when Graph is already available (CI installs pin for **`Test-ModuleManifest`** only).
 
 **Dependencies:** **A** (version string), **B** (**RootModule** file exists)
 
