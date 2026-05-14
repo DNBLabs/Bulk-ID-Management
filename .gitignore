@@ -1,12 +1,22 @@
 # Secrets and local credentials (see CONTEXT.md / docs/Design/SEC.md)
 .env
 .env.*
+!.env.example
 *.pem
 *.key
 *.pfx
 *.p12
 *client_secret*
 *credentials*.json
+
+# Azure-style local token/cache directories and operator-local config (SEC / CONTEXT)
+.azure/
+.Azure/
+.azcopy/
+*.local.psd1
+*.parameters.local.json
+*.local.parameters.json
+local.settings.json
 
 # Terraform / IaC local state and vars (see docs/Design/IDD.md)
 .terraform/
