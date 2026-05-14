@@ -117,12 +117,12 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 **Description:** Compare current **`.gitignore`** to **PRD** and **SEC** categories. Add **only** justified patterns: e.g. Azure-style CLI cache directories, operator-local script or settings filenames called out in the PRD, without broad “ignore everything” rules. Preserve existing **Terraform** / **`.env`** / key-material / transcript patterns; retain **`!*.tfvars.example`** (or equivalent) if present.
 
 **Acceptance criteria:**
-- [ ] New patterns map to a **SEC** category (secrets, credentials, transcripts, local config, token cache).
-- [ ] No unrelated binary or build-artifact ignores unless tied to documented risk.
-- [ ] **`.tfvars`** remain ignored with safe **example** exception unchanged unless **IDD** / repo policy changes.
+- [x] New patterns map to a **SEC** category (secrets, credentials, transcripts, local config, token cache). — Added Azure-style cache dirs and narrowly-scoped operator-local config patterns; Sub-task D Pester asserts each category with `git check-ignore`.
+- [x] No unrelated binary or build-artifact ignores unless tied to documented risk. — Sub-task D Pester guards against broad unrelated patterns such as `node_modules/`, `dist/`, `build/`, `bin/`, `obj/`, and `*.zip`.
+- [x] **`.tfvars`** remain ignored with safe **example** exception unchanged unless **IDD** / repo policy changes. — Existing `*.tfvars` and `!*.tfvars.example` behavior is asserted by Sub-task D Pester.
 
 **Verification:**
-- [ ] Manual: Walk **`git status`** after creating dummy ignored filenames locally (do not commit dummies); confirm they stay **untracked**.
+- [x] Manual: Walk **`git status`** after creating dummy ignored filenames locally (do not commit dummies); confirm they stay **untracked**. — Automated equivalent added in **`tests/Task1.SubTaskD.GitIgnorePolicy.Tests.ps1`** using **`git check-ignore --no-index`** without creating dummy files.
 
 **Dependencies:** None (parallelizable)
 
@@ -140,13 +140,13 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 **Description:** Confirm the **Implementation Plan Task 1** acceptance criteria and PRD **Out of Scope** boundaries: no **README**, no **CI YAML**, no **Graph** API usage, no **Pester** requirement, no secrets in tracked files.
 
 **Acceptance criteria:**
-- [ ] **`Test-ModuleManifest`** still succeeds after all edits.
-- [ ] **`git diff`** review: no private keys, **client secrets**, populated **`.tfvars`**, or production **Entra** authentication secrets.
-- [ ] **Task 1** parent checklist in **IMPLEMENTATION-PLAN** can be marked complete (single PR or coordinated commit).
+- [x] **`Test-ModuleManifest`** still succeeds after all edits. — Verified with **`Invoke-ModuleManifestCI.ps1`** after Sub-task D / E changes.
+- [x] **`git diff`** review: no private keys, **client secrets**, populated **`.tfvars`**, or production **Entra** authentication secrets. — Reviewed Task 1 diff with secret-marker scan; no secret-bearing values added.
+- [x] **Task 1** parent checklist in **IMPLEMENTATION-PLAN** can be marked complete (single PR or coordinated commit). — Parent Task 1 acceptance and verification bullets updated; Task 2 remains unchecked.
 
 **Verification:**
-- [ ] Manual: `Test-ModuleManifest` + `Import-Module` smoke (repeat **C**/**B**).
-- [ ] Manual: Grep / review diff for **tenant ID** usage only if **non-secret** per org policy; default is **avoid** production identifiers in Task 1 entirely.
+- [x] Manual: `Test-ModuleManifest` + `Import-Module` smoke (repeat **C**/**B**). — Manifest CI step and Pester suite pass with the pinned **Microsoft.Graph** dependency resolved.
+- [x] Manual: Grep / review diff for **tenant ID** usage only if **non-secret** per org policy; default is **avoid** production identifiers in Task 1 entirely. — No production tenant IDs or authentication secrets were introduced.
 
 **Dependencies:** **B**, **C**, **D** complete
 
@@ -158,10 +158,10 @@ Resolve Microsoft.Graph version from PSGallery (sub-task A)
 
 ## Checkpoint: Task 1 foundation complete
 
-- [ ] **Sub-tasks A–E** acceptance boxes satisfied.
-- [ ] **`pwsh`** smoke: manifest valid, module imports.
-- [ ] **`.gitignore`** matches **SEC** / PRD intent.
-- [ ] Ready for **Task 2** (README) or **Task 3** (CSV) in separate work—**do not** start them inside this closure PR unless explicitly directed.
+- [x] **Sub-tasks A–E** acceptance boxes satisfied.
+- [x] **`pwsh`** smoke: manifest valid, module imports.
+- [x] **`.gitignore`** matches **SEC** / PRD intent.
+- [x] Ready for **Task 2** (README) or **Task 3** (CSV) in separate work—**do not** start them inside this closure PR unless explicitly directed.
 
 ---
 

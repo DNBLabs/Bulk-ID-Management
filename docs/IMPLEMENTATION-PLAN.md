@@ -60,13 +60,13 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Add a minimal PowerShell project layout: module folder placeholder, `requirements.psd1` (or equivalent) with **exact pinned** **Microsoft.Graph** (and related) versions, `.gitignore` entries for secrets, certificates, `*.tfvars`, local config, and transcripts that might contain sensitive **apply** output.
 
 **Acceptance criteria:**
-- [ ] A repository-owned manifest lists **exact** module versions (no floating **Latest**).
-- [ ] `.gitignore` excludes common secret and credential paths documented in **SEC** / **CONTEXT**.
-- [ ] `pwsh` is documented as the supported runtime (**7.2+**, **7.4+** preferred).
+- [x] A repository-owned manifest lists **exact** module versions (no floating **Latest**).
+- [x] `.gitignore` excludes common secret and credential paths documented in **SEC** / **CONTEXT**.
+- [x] `pwsh` is documented as the supported runtime (**7.2+**, **7.4+** preferred).
 
 **Verification:**
-- [ ] Manual: `Test-ModuleManifest` (or equivalent) succeeds on the manifest if a module manifest is present.
-- [ ] Manual: Confirm no real tenant IDs or secrets were added to tracked files.
+- [x] Manual: `Test-ModuleManifest` (or equivalent) succeeds on the manifest if a module manifest is present.
+- [x] Manual: Confirm no real tenant IDs or secrets were added to tracked files.
 
 **Dependencies:** None
 
