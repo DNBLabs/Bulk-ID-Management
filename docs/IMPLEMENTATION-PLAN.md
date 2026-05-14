@@ -84,12 +84,12 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Add **README** that points to **CONTEXT.md** first, summarizes **apply path** vs **CI scope**, states **dry-run before mutating apply**, and links **HLD**, **IDD**, **SEC**, **PRD**, and informal **init-project** as background. No committed secrets or real tenant identifiers.
 
 **Acceptance criteria:**
-- [ ] **README** opens with a pointer to **CONTEXT.md** as normative.
-- [ ] **CI validation gates** and **no Graph in default CI** are stated explicitly.
-- [ ] Certificate material **outside repo** is stated; **client secret** not default.
+- [x] **README** opens with a pointer to **CONTEXT.md** as normative. — README now starts with **`CONTEXT.md`** as the normative glossary and behavioral contract.
+- [x] **CI validation gates** and **no Graph in default CI** are stated explicitly. — README documents validate-only **PSScriptAnalyzer** / **Pester** gates and says default CI does not call **Microsoft Graph**.
+- [x] Certificate material **outside repo** is stated; **client secret** not default. — README states certificate/private-key material stays outside the repository and client secret is not the default path.
 
 **Verification:**
-- [ ] Manual: README renders correctly; links resolve relative to repo root.
+- [x] Manual: README renders correctly; links resolve relative to repo root. — README artifact verification passed for Markdown structure, root-relative links, and secret/unsupported-command hygiene.
 
 **Dependencies:** Task 1 (optional overlap; can start in parallel once paths known)
 
