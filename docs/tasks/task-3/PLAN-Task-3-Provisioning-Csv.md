@@ -148,14 +148,15 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Private logic: first logical record is the header. Trim header cells; detect duplicate canonical names after trim; verify all **required** headers present with **case-sensitive** match; build a map of canonical column → field index; **ignore** unknown header names (no error). Header problems throw before processing data records (reference header line **1** or “header row”).
 
 **Acceptance criteria:**
-- [ ] Missing **LastName** (or any required) header fails before data rows processed.
-- [ ] Duplicate **Department** header fails.
-- [ ] `firstname` wrong case fails (not treated as **FirstName**).
-- [ ] ` EmployeeId` unknown column does not appear in column map.
-- [ ] Header ` Department` (trimmed) matches **Department**.
+- [x] Missing **LastName** (or any required) header fails before data rows processed. — `Get-ProvisioningCsvHeaderColumnMap` throws before map returned; `Task3.SubTaskD.HeaderValidation.Tests.ps1`.
+- [x] Duplicate **Department** header fails. — Duplicate trimmed header names rejected with header line reference.
+- [x] `firstname` wrong case fails (not treated as **FirstName**). — Case-sensitive canonical match; missing **FirstName** error.
+- [x] ` EmployeeId` unknown column does not appear in column map. — Unknown trimmed names omitted from map.
+- [x] Header ` Department` (trimmed) matches **Department**. — Header cell trim before canonical lookup.
 
 **Verification:**
 - [ ] **Sub-task I** header-focused **Pester** cases.
+- [x] Security: safe header errors, duplicate unknown columns, 256-field cap, not exported (**`Task3.SubTaskD.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task C
 
