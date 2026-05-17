@@ -221,13 +221,14 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Export **`Import-ProvisioningCsv`** via **`Export-ModuleMember`** in **`.psm1`** (or manifest-aligned pattern). Set **`FunctionsToExport = @('Import-ProvisioningCsv')`** in **`BulkIdentityManagement.psd1`**. Confirm **`.psm1`** still does not call Graph on import.
 
 **Acceptance criteria:**
-- [ ] **`FunctionsToExport`** lists **`Import-ProvisioningCsv`** only (for Task 3).
-- [ ] **`Import-Module`** manifest path exposes the command.
-- [ ] No new Graph usage in module root or CSV scripts.
+- [x] **`FunctionsToExport`** lists **`Import-ProvisioningCsv`** only (for Task 3). — Manifest and **`Export-ModuleMember`** aligned; **`Task3.SubTaskG.ModuleExport.Tests.ps1`**.
+- [x] **`Import-Module`** manifest path exposes the command. — **`Test-ModuleManifest`** export list when pinned **Microsoft.Graph** is installed locally (skipped otherwise).
+- [x] No new Graph usage in module root or CSV scripts. — **`Task3.SubTaskG.Security.Tests.ps1`**; root **`.psm1`** unchanged for Graph client calls.
 
 **Verification:**
-- [ ] **Pester:** imported module reports exported function **`Import-ProvisioningCsv`** (may use manifest import; Graph module may load but must not connect—acceptable if CI already installs pin).
-- [ ] **`Invoke-ScriptAnalyzer`** clean on new **`.ps1`** files (run locally; full CI gate is Task 14).
+- [x] **Pester:** imported module reports exported function **`Import-ProvisioningCsv`** (may use manifest import; Graph module may load but must not connect—acceptable if CI already installs pin). — **`Task3.SubTaskG.ModuleExport.Tests.ps1`**.
+- [x] Security: minimal export surface, no Graph at import, no wildcard exports, private helpers not public (**`Task3.SubTaskG.Security.Tests.ps1`**).
+- [x] **`Invoke-ScriptAnalyzer`** clean on new **`.ps1`** files (run locally; full CI gate is Task 14). — No new **`.ps1`** in **G**; analyzer run on module root after wiring.
 
 **Dependencies:** Sub-task F
 
