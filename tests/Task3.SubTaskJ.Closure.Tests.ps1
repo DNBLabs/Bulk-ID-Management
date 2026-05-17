@@ -100,10 +100,4 @@ Describe 'Task 3 Sub-task J - closure checklist verification' {
         $implementationPlan | Should -Match '(?m)^- \[x\] Manual: Run validator against a tiny good CSV and a bad CSV\.'
     }
 
-    It 'does not mark Task 4 acceptance complete or introduce Task 4 test files' {
-        $implementationPlan = Get-Content -LiteralPath $script:ImplementationPlanPath -Raw
-        $implementationPlan | Should -Match '(?m)^- \[ \] \*\*givenName\*\*, \*\*surname\*\*, \*\*displayName\*\* match \*\*CONTEXT\*\* rules for default columns\.'
-        Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Task4*.Tests.ps1' -File -ErrorAction SilentlyContinue |
-            Should -BeNullOrEmpty
-    }
 }

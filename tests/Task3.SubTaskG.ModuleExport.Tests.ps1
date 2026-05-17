@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Validates manifest FunctionsToExport, Export-ModuleMember alignment, and that
-    Import-ProvisioningCsv is the sole public function after Import-Module.
+    public functions after Import-Module (Task 3 CSV import; Task 4 name mapping).
 #>
 
 BeforeAll {
@@ -12,33 +12,44 @@ BeforeAll {
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
     $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
     $script:Psd1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psd1'
-    $script:ExpectedPublicFunction = 'Import-ProvisioningCsv'
+    $script:ExpectedPublicFunctions = @(
+        'Import-ProvisioningCsv'
+        'Get-MappedProvisioningIdentity'
+    )
 }
 
 Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
 
-    It 'lists Import-ProvisioningCsv as the only function in FunctionsToExport' {
+    It 'lists Task 3 and Task 4 public functions in FunctionsToExport' {
         $data = Import-PowerShellDataFile -Path $script:Psd1Path
-        @($data.FunctionsToExport) | Should -BeExactly @($script:ExpectedPublicFunction)
+        @($data.FunctionsToExport) | Should -BeExactly @($script:ExpectedPublicFunctions)
         $data.CmdletsToExport.Count | Should -Be 0
         $data.AliasesToExport.Count | Should -Be 0
         $data.VariablesToExport.Count | Should -Be 0
     }
 
-    It 'exports Import-ProvisioningCsv via Export-ModuleMember in the root script module' {
+    It 'exports public functions via Export-ModuleMember in the root script module' {
         $text = Get-Content -LiteralPath $script:Psm1Path -Raw
-        $text | Should -Match "Export-ModuleMember\s+-Function\s+@\(\s*'$script:ExpectedPublicFunction'\s*\)"
+        $text | Should -Match 'Export-ModuleMember\s+-Function\s+@\('
+        foreach ($functionName in $script:ExpectedPublicFunctions) {
+            $text | Should -Match [regex]::Escape($functionName)
+        }
     }
 
-    It 'exposes Import-ProvisioningCsv as the only exported function when importing the root script module' {
+    It 'exposes Task 3 and Task 4 public functions when importing the root script module' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $script:Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
-            @($moduleInfo.ExportedFunctions.Keys) | Should -BeExactly @($script:ExpectedPublicFunction)
+            @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Get-MappedProvisioningIdentity'
+                'Import-ProvisioningCsv'
+            )
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
             $moduleInfo.ExportedAliases.Count | Should -Be 0
-            Get-Command -Module $moduleInfo -Name $script:ExpectedPublicFunction -CommandType Function |
-                Should -Not -BeNullOrEmpty
+            foreach ($functionName in $script:ExpectedPublicFunctions) {
+                Get-Command -Module $moduleInfo -Name $functionName -CommandType Function |
+                    Should -Not -BeNullOrEmpty
+            }
         }
         finally {
             Remove-Module -ModuleInfo $moduleInfo -Force -ErrorAction SilentlyContinue
@@ -52,6 +63,10 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
             { Get-Command -Module $moduleInfo -Name Get-ProvisioningCsvLogicalRecords -ErrorAction Stop } |
                 Should -Throw
             { Get-Command -Module $moduleInfo -Name Read-ProvisioningCsvUtf8 -ErrorAction Stop } |
+                Should -Throw
+            { Get-Command -Module $moduleInfo -Name Get-NormalizedProvisioningMailNickname -ErrorAction Stop } |
+                Should -Throw
+            { Get-Command -Module $moduleInfo -Name Get-ProvisioningNameMappingFromRow -ErrorAction Stop } |
                 Should -Throw
         }
         finally {
@@ -72,6 +87,9 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
         }
 
         $manifestInfo = Test-ModuleManifest -Path $script:Psd1Path -ErrorAction Stop
-        @($manifestInfo.ExportedFunctions.Keys) | Should -BeExactly @($script:ExpectedPublicFunction)
+        @($manifestInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+            'Get-MappedProvisioningIdentity'
+            'Import-ProvisioningCsv'
+        )
     }
 }

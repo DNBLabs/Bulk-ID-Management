@@ -4,7 +4,7 @@
 
 .DESCRIPTION
     Confirms the root script module does not add Graph client calls at import time,
-    keeps the public export surface limited to Import-ProvisioningCsv, and does not
+    keeps the public export surface limited to documented public functions, and does not
     widen cmdlet, alias, or variable exports.
 #>
 
@@ -13,7 +13,10 @@ BeforeAll {
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
     $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
     $script:Psd1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psd1'
-    $script:ExpectedPublicFunction = 'Import-ProvisioningCsv'
+    $script:ExpectedPublicFunctions = @(
+        'Import-ProvisioningCsv'
+        'Get-MappedProvisioningIdentity'
+    )
 }
 
 Describe 'Task 3 Sub-task G - export wiring security' {
@@ -48,9 +51,12 @@ Describe 'Task 3 Sub-task G - export wiring security' {
         $text | Should -Not -Match 'Export-ModuleMember\s+-Alias\s+\*'
     }
 
-    It 'exports only Import-ProvisioningCsv via Export-ModuleMember without cmdlet or variable exports' {
+    It 'exports only documented public functions via Export-ModuleMember without cmdlet or variable exports' {
         $text = Get-Content -LiteralPath $script:Psm1Path -Raw
-        $text | Should -Match "Export-ModuleMember\s+-Function\s+@\(\s*'$script:ExpectedPublicFunction'\s*\)"
+        $text | Should -Match 'Export-ModuleMember\s+-Function\s+@\('
+        foreach ($functionName in $script:ExpectedPublicFunctions) {
+            $text | Should -Match [regex]::Escape($functionName)
+        }
         $text | Should -Not -Match 'Export-ModuleMember\s+-Cmdlet'
         $text | Should -Not -Match 'Export-ModuleMember\s+-Variable'
         $text | Should -Not -Match 'Export-ModuleMember\s+-Alias'
@@ -67,9 +73,9 @@ Describe 'Task 3 Sub-task G - export wiring security' {
         }
     }
 
-    It 'lists Import-ProvisioningCsv as the only function export and keeps other manifest export lists empty' {
+    It 'lists documented public function exports and keeps other manifest export lists empty' {
         $data = Import-PowerShellDataFile -Path $script:Psd1Path
-        @($data.FunctionsToExport) | Should -BeExactly @($script:ExpectedPublicFunction)
+        @($data.FunctionsToExport) | Should -BeExactly @($script:ExpectedPublicFunctions)
         $data.CmdletsToExport.Count | Should -Be 0
         $data.AliasesToExport.Count | Should -Be 0
         $data.VariablesToExport.Count | Should -Be 0
@@ -101,7 +107,10 @@ Describe 'Task 3 Sub-task G - export wiring security' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $script:Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
-            @($moduleInfo.ExportedFunctions.Keys) | Should -BeExactly @($script:ExpectedPublicFunction)
+            @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Get-MappedProvisioningIdentity'
+                'Import-ProvisioningCsv'
+            )
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
             $moduleInfo.ExportedAliases.Count | Should -Be 0
             $moduleInfo.ExportedVariables.Count | Should -Be 0

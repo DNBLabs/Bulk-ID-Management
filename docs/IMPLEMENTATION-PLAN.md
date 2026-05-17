@@ -130,12 +130,12 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Implement **name mapping** from **FirstName** / **LastName** (trim, collapse internal spaces) to **givenName**, **surname**, **displayName**. Implement default **MailNickname** normalization (lowercase, strip accents, safe characters per **CONTEXT** / PRD). Optional CSV overrides for **MailNickname** / **UserPrincipalName** pass through when present (v1 minimal sample may omit **GivenName**/**Surname**/**DisplayName** overrides—document reserved columns).
 
 **Acceptance criteria:**
-- [ ] **givenName**, **surname**, **displayName** match **CONTEXT** rules for default columns.
-- [ ] Normalization covers documented edge cases (accents, spaces) with Pester examples.
-- [ ] Optional override columns reserved for future are documented without breaking v1 sample shape.
+- [x] **givenName**, **surname**, **displayName** match **CONTEXT** rules for default columns. — `Get-MappedProvisioningIdentity` + `Task4.NameMapping.Tests.ps1`.
+- [x] Normalization covers documented edge cases (accents, spaces) with Pester examples. — `Task4.MailNickname.Tests.ps1` and mapping diacritic cases.
+- [x] Optional **GivenName** / **Surname** / **DisplayName** overrides active in v1; v1 sample CSV stays minimal (core columns only). — **CONTEXT** + override tests; no sample CSV change in Task 4.
 
 **Verification:**
-- [ ] Tests pass: Pester for name mapping and nickname cases.
+- [x] Tests pass: Pester for name mapping and nickname cases. — `tests/Task4*.Tests.ps1` (**34** tests, includes `Task4.Mapping.Security.Tests.ps1`).
 
 **Dependencies:** Task 3 (row shape) — or define shared **row type** in Task 3 so Task 4 can parallelize after interface is frozen.
 
