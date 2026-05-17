@@ -30,6 +30,10 @@ function Import-ProvisioningCsv {
     )
 
     $physicalLines = Read-ProvisioningCsvUtf8 -Path $Path
+    if ($null -eq $physicalLines) {
+        $physicalLines = [string[]]@()
+    }
+
     $logicalRecords = Get-ProvisioningCsvLogicalRecords -PhysicalLines $physicalLines
 
     if ($logicalRecords.Count -eq 0) {
