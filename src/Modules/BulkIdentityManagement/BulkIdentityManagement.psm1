@@ -54,4 +54,7 @@ $dotSourceModuleChildScripts = {
 . $dotSourceModuleChildScripts -FolderName Private
 . $dotSourceModuleChildScripts -FolderName Public
 
-Export-ModuleMember -Function @('Import-ProvisioningCsv')
+Export-ModuleMember -Function @(
+    'Import-ProvisioningCsv'
+    'Get-MappedProvisioningIdentity'
+)
