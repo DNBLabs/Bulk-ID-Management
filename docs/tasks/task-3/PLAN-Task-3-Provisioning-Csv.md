@@ -198,13 +198,14 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Public function **`Import-ProvisioningCsv`** with mandatory **`-Path`**. Orchestrate validation order: read UTF-8 → parse records → validate header → materialize rows → output to pipeline. Any failure: terminating throw, **no** pipeline output. Use **`[CmdletBinding()]`** and comment-based help referencing **CONTEXT** / **Provisioning CSV format**.
 
 **Acceptance criteria:**
-- [ ] Successful import writes rows to pipeline in file order.
-- [ ] Any validation failure throws; **no** objects emitted.
-- [ ] Missing file path handled with standard parameter/file error before contract validation (acceptable).
+- [x] Successful import writes rows to pipeline in file order. — `Import-ProvisioningCsv` orchestrates private helpers; `Task3.SubTaskF.ImportProvisioningCsv.Tests.ps1`.
+- [x] Any validation failure throws; **no** objects emitted. — Header validation failure emits zero pipeline objects before throw.
+- [x] Missing file path handled with standard parameter/file error before contract validation (acceptable). — `FileNotFoundException` from UTF-8 read; no pipeline output.
 
 **Verification:**
 - [ ] **Sub-task H** end-to-end **Pester** on **`Import-ProvisioningCsv`**.
 - [ ] Manual: **`Import-ProvisioningCsv -Path`** on a tiny good CSV and a bad CSV in **pwsh**.
+- [x] Security: fail-closed pipeline, safe encoding/parse errors, no Graph in import script (**`Task3.SubTaskF.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task E
 
