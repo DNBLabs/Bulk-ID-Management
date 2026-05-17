@@ -122,14 +122,15 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Implement a private parser that, given UTF-8 text/lines, yields logical CSV **records** each with **start physical line number** and **field values** (strings). Enforce comma delimiter only. Support quoted fields, commas inside quotes, and escaped quotes. Malformed records (e.g. unclosed quote) throw with an actionable parse message referencing **start line** where possible.
 
 **Acceptance criteria:**
-- [ ] Parses minimal unquoted rows correctly.
-- [ ] Parses a quoted field containing a comma (e.g. `"O'Brien, Jr"`).
-- [ ] Unclosed/malformed quoting fails the import (terminating).
-- [ ] Each record exposes **start line number** (1-based physical line of record start).
+- [x] Parses minimal unquoted rows correctly. — `Get-ProvisioningCsvLogicalRecords` in `Get-ProvisioningCsvRecord.ps1`; covered by `Task3.SubTaskC.CsvRecordParser.Tests.ps1`.
+- [x] Parses a quoted field containing a comma (e.g. `"O'Brien, Jr"`). — Quoted-comma and `""` escape cases in Sub-task C tests.
+- [x] Unclosed/malformed quoting fails the import (terminating). — `InvalidOperationException` cites record **start** physical line.
+- [x] Each record exposes **start line number** (1-based physical line of record start). — `StartLineNumber` on each logical record object.
 
 **Verification:**
 - [ ] **Sub-task I** includes quoted-field and malformed-parse cases via **`Import-ProvisioningCsv`**.
-- [ ] Optional: one focused **It** with inline CSV text if it reduces flake vs file fixtures.
+- [x] Optional: one focused **It** with inline CSV text if it reduces flake vs file fixtures. — `Task3.SubTaskC.CsvRecordParser.Tests.ps1` uses inline **PhysicalLines** arrays.
+- [x] Security: comma-only (no `Import-Csv`/delimiter sniff), safe malformed-parse errors, 256-field cap per record, parser not exported (**`Task3.SubTaskC.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task B
 
@@ -307,10 +308,10 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 ## Checkpoints
 
 ### Checkpoint: After Sub-task C
-- [ ] UTF-8 read works for BOM and non-BOM fixtures.
-- [ ] Record parser returns expected field count on a quoted-comma fixture.
-- [ ] Malformed CSV throws before any row materialization.
-- [ ] Proceed to header/row logic only when parser is stable.
+- [x] UTF-8 read works for BOM and non-BOM fixtures. — Sub-task B complete; 30/30 Task 3 Pester tests pass.
+- [x] Record parser returns expected field count on a quoted-comma fixture. — Sub-task C quoted-comma and multiline-quote tests pass.
+- [x] Malformed CSV throws before any row materialization. — Sub-task C unclosed-quote and post-quote garbage tests pass.
+- [x] Proceed to header/row logic only when parser is stable. — Parser unit-tested; ready for Sub-task D.
 
 ### Checkpoint: After Sub-task G
 - [ ] **`Import-ProvisioningCsv`** callable from imported module.
