@@ -247,11 +247,12 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Add **`tests/Task3.ProvisioningCsv.Success.Tests.ps1`** (or equivalent). **BeforeAll:** resolve repo root, dot-source module scripts (avoid Graph auth). Use **TestDrive** or **`tests/fixtures/csv/`** for UTF-8 fixtures. Cover: minimal good CSV; UTF-8 BOM; optional columns present/absent; quoted comma field; unknown column ignored; **SourceLineNumber** values; trimmed values; multiple rows in order.
 
 **Acceptance criteria:**
-- [ ] **`Invoke-Pester`** on this file passes in **pwsh** without tenant credentials.
-- [ ] Tests assert observable row properties, not private function names.
+- [x] **`Invoke-Pester`** on this file passes in **pwsh** without tenant credentials. — **`Task3.ProvisioningCsv.Success.Tests.ps1`** (10 scenarios via **`Import-ProvisioningCsv`**).
+- [x] Tests assert observable row properties, not private function names. — Row shape, trimming, **SourceLineNumber**, optional gating; no private helper calls.
 
 **Verification:**
-- [ ] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task3.ProvisioningCsv.Success.Tests.ps1' -CI"`
+- [x] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task3.ProvisioningCsv.Success.Tests.ps1' -CI"` — Verified locally (**10/10** pass).
+- [x] Security: unknown-column data not on rows, literal cell handling, size limit fail-closed (**`Task3.ProvisioningCsv.Success.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task G
 
