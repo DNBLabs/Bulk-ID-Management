@@ -12,6 +12,11 @@ BeforeAll {
     $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
     Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 
+    $script:eAcute = [char]0x00E9
+    $script:iAcute = [char]0x00ED
+    $script:oUmlaut = [char]0x00F6
+    $script:sharpS = [char]0x00DF
+
     function script:New-TestProvisioningRow {
         param(
             [Parameter(Mandatory)]
@@ -68,8 +73,8 @@ Describe 'Task 4 - MailNickname via Get-MappedProvisioningIdentity' {
 
     It 'derives jose.garcia with accents stripped from nickname only' {
         $row = New-TestProvisioningRow -Properties @{
-            FirstName = 'José'
-            LastName  = 'García'
+            FirstName = "Jos$($script:eAcute)"
+            LastName  = "Garc$($script:iAcute)a"
         }
 
         $mapped = Get-MappedProvisioningIdentity -ProvisioningRow $row
@@ -78,8 +83,8 @@ Describe 'Task 4 - MailNickname via Get-MappedProvisioningIdentity' {
 
     It 'derives bjorn.weiss with umlaut and eszett normalized' {
         $row = New-TestProvisioningRow -Properties @{
-            FirstName = 'Björn'
-            LastName  = 'Weiß'
+            FirstName = "Bj$($script:oUmlaut)rn"
+            LastName  = "Wei$($script:sharpS)"
         }
 
         $mapped = Get-MappedProvisioningIdentity -ProvisioningRow $row

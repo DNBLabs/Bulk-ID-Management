@@ -11,6 +11,8 @@ BeforeAll {
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
     $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
     $script:Psd1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psd1'
+    $script:eAcute = [char]0x00E9
+    $script:iAcute = [char]0x00ED
 }
 
 Describe 'Task 4 Sub-task I - module export and integration' {
@@ -36,16 +38,18 @@ Describe 'Task 4 Sub-task I - module export and integration' {
         Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
         try {
             $csvPath = Join-Path -Path $TestDrive -ChildPath 'accent.csv'
+            $firstName = "Jos$($script:eAcute)"
+            $lastName = "Garc$($script:iAcute)a"
             $content = @(
                 'FirstName,LastName,Department'
-                'José,García,Engineering'
+                "$firstName,$lastName,Engineering"
             ) -join "`n"
             Set-Content -LiteralPath $csvPath -Value $content -Encoding utf8NoBOM
 
             $row = (Import-ProvisioningCsv -Path $csvPath | Select-Object -First 1)
             $mapped = Get-MappedProvisioningIdentity -ProvisioningRow $row
 
-            $mapped.GivenName | Should -Be 'José'
+            $mapped.GivenName | Should -Be $firstName
             $mapped.MailNickname | Should -Be 'jose.garcia'
         }
         finally {

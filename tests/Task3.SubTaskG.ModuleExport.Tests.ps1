@@ -32,7 +32,8 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
         $text = Get-Content -LiteralPath $script:Psm1Path -Raw
         $text | Should -Match 'Export-ModuleMember\s+-Function\s+@\('
         foreach ($functionName in $script:ExpectedPublicFunctions) {
-            $text | Should -Match [regex]::Escape($functionName)
+            $escapedFunctionName = [regex]::Escape($functionName)
+            $text | Should -Match $escapedFunctionName
         }
     }
 

@@ -10,7 +10,7 @@
 
 BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
-    $script:TaskPlanPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs/tasks/PLAN-Task-1-Foundation.md'
+    $script:TaskPlanPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs/tasks/task-1/PLAN-Task-1-Foundation.md'
     $script:ImplementationPlanPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs/IMPLEMENTATION-PLAN.md'
 }
 
@@ -40,11 +40,12 @@ Describe 'Task 1 Sub-task E - closure verification' {
         $implementationPlan | Should -Match '(?m)^- \[x\] `pwsh` is documented as the supported runtime \(\*\*7\.2\+\*\*, \*\*7\.4\+\*\* preferred\)\.'
         $implementationPlan | Should -Match '(?m)^- \[x\] Manual: `Test-ModuleManifest` \(or equivalent\) succeeds on the manifest if a module manifest is present\.'
         $implementationPlan | Should -Match '(?m)^- \[x\] Manual: Confirm no real tenant IDs or secrets were added to tracked files\.'
-        $implementationPlan | Should -Match '(?m)^- \[ \] \*\*README\*\* opens with a pointer to \*\*CONTEXT\.md\*\* as normative\.'
+        $implementationPlan | Should -Match '(?m)^- \[x\] \*\*README\*\* opens with a pointer to \*\*CONTEXT\.md\*\* as normative\.'
     }
 
-    It 'does not introduce Task 2 artifacts or a root requirements.psd1 while closing Task 1' {
-        Test-Path -LiteralPath (Join-Path -Path $script:RepoRoot -ChildPath 'README.md') | Should -BeFalse
+    It 'keeps module pins in the module manifest and does not add a root requirements.psd1' {
+        Test-Path -LiteralPath (Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psd1') |
+            Should -BeTrue
         Test-Path -LiteralPath (Join-Path -Path $script:RepoRoot -ChildPath 'requirements.psd1') | Should -BeFalse
     }
 }

@@ -47,7 +47,7 @@ function Get-MappedProvisioningIdentity {
             -SourceLineNumber $sourceLineNumber
     }
 
-    Test-MappedProvisioningIdentityFieldLengths `
+    Test-MappedProvisioningIdentityFieldLength `
         -GivenName $nameMapping.GivenName `
         -Surname $nameMapping.Surname `
         -DisplayName $nameMapping.DisplayName `

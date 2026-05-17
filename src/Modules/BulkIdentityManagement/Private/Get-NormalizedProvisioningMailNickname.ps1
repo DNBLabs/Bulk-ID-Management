@@ -45,7 +45,7 @@ function Get-NormalizedProvisioningMailNickname {
     }
 
     $normalized = $NicknameInput.ToLowerInvariant()
-    $normalized = $normalized.Replace('ß', 'ss')
+    $normalized = $normalized.Replace([string][char]0x00DF, 'ss')
 
     $formD = $normalized.Normalize([System.Text.NormalizationForm]::FormD)
     $withoutMarks = [System.Text.StringBuilder]::new()

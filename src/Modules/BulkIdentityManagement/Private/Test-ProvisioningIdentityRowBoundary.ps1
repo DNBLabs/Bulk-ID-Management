@@ -108,7 +108,7 @@ function Test-ProvisioningIdentityStringFieldLength {
     }
 }
 
-function Test-MappedProvisioningIdentityFieldLengths {
+function Test-MappedProvisioningIdentityFieldLength {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
