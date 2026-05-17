@@ -172,14 +172,15 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Private logic: for each subsequent logical record, determine if all fields are empty/whitespace after trim → **skip**; else validate **required** fields non-empty after trim or throw with **physical line number**; build **PSCustomObject** with **SourceLineNumber**, trimmed **FirstName**/**LastName**/**Department**, and optional properties only when header existed and cell non-empty after trim. After iteration, if zero materialized rows → throw (“no provisioning rows”).
 
 **Acceptance criteria:**
-- [ ] Minimal three-column row materializes three core properties + **SourceLineNumber**.
-- [ ] All-whitespace data row skipped.
-- [ ] Header-only file (or only skipped rows) fails with no provisioning rows.
-- [ ] Optional header + blank cell → optional property absent on object.
-- [ ] Optional header + value → trimmed property present.
+- [x] Minimal three-column row materializes three core properties + **SourceLineNumber**. — `Get-ProvisioningCsvMaterializedRows` in `New-ProvisioningCsvRow.ps1`; `Task3.SubTaskE.RowMaterialization.Tests.ps1`.
+- [x] All-whitespace data row skipped. — Skip when every field is whitespace after trim.
+- [x] Header-only file (or only skipped rows) fails with no provisioning rows. — Throws when zero rows materialized.
+- [x] Optional header + blank cell → optional property absent on object. — Optional properties gated by non-empty trimmed cell.
+- [x] Optional header + value → trimmed property present. — MailNickname optional case in Sub-task E tests.
 
 **Verification:**
 - [ ] **Sub-task H/I** row-shape **Pester** cases.
+- [x] Security: safe row errors, header map integrity, 65535 data-record cap, not exported (**`Task3.SubTaskE.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task D
 
