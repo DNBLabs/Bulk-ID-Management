@@ -76,13 +76,14 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Create **`src/Modules/BulkIdentityManagement/Public/`** and **`Private/`** folders. Add a private constants script (required/optional header name sets). Update **`BulkIdentityManagement.psm1`** to dot-source **`Private/*.ps1`** then **`Public/*.ps1`** (order: dependencies first). No public exports until **Sub-task G**.
 
 **Acceptance criteria:**
-- [ ] **Public/** and **Private/** exist under **BulkIdentityManagement**.
-- [ ] Canonical required/optional column names live in one private constants location.
-- [ ] Root **`.psm1`** dot-sources child scripts; still no Graph calls at import time.
+- [x] **Public/** and **Private/** exist under **BulkIdentityManagement**. — Added `Public/` (with `.gitkeep`) and `Private/` with `ProvisioningCsv.Constants.ps1`.
+- [x] Canonical required/optional column names live in one private constants location. — `$RequiredProvisioningCsvHeaderNames` and `$OptionalProvisioningCsvHeaderNames` in constants script.
+- [x] Root **`.psm1`** dot-sources child scripts; still no Graph calls at import time. — Private scripts dot-sourced before Public; no Graph references in CSV layout files.
 
 **Verification:**
-- [ ] Manual: **`Import-Module`** the **`.psm1`** path in **pwsh** succeeds without error.
-- [ ] Manual: No **`Connect-MgGraph`** / **`Import-Module Microsoft.Graph`** in new CSV scripts.
+- [x] Manual: **`Import-Module`** the **`.psm1`** path in **pwsh** succeeds without error. — Covered by Pester import test in `Task3.SubTaskA.ModuleLayout.Tests.ps1`.
+- [x] Manual: No **`Connect-MgGraph`** / **`Import-Module Microsoft.Graph`** in new CSV scripts. — Pester scans **psm1**, **Private**, and **Public** scripts.
+- [x] Security: dot-source paths resolved and confined under module root; no high-risk execution/network patterns in layout scripts (**`Task3.SubTaskA.Security.Tests.ps1`**).
 
 **Dependencies:** None (Task 1 foundation)
 
