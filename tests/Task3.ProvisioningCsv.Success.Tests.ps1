@@ -44,7 +44,7 @@ BeforeAll {
         [System.IO.File]::WriteAllText($Path, $Content, $utf8WithBom)
     }
 
-    function script:Get-ImportedProvisioningRows {
+    function script:Import-ProvisioningCsvFromTestPath {
         param(
             [Parameter(Mandatory)]
             [string] $CsvPath
@@ -68,7 +68,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows.Count | Should -Be 1
         $rows[0].FirstName | Should -Be 'Ada'
@@ -88,7 +88,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         $content = "FirstName,LastName,Department`r`nGrace,Hopper,IT"
         Write-ProvisioningCsvUtf8WithBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows.Count | Should -Be 1
         $rows[0].FirstName | Should -Be 'Grace'
@@ -103,7 +103,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].FirstName | Should -Be 'Ada'
         $rows[0].LastName | Should -Be 'Lovelace'
@@ -120,7 +120,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows.Count | Should -Be 3
         $rows[0].FirstName | Should -Be 'Ada'
@@ -139,7 +139,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].FirstName | Should -Be "O'Brien, Jr"
         $rows[0].LastName | Should -Be 'Lovelace'
@@ -153,7 +153,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].MailNickname | Should -Be 'ada.lovelace'
         $rows[0].UserPrincipalName | Should -Be 'ada@contoso.com'
@@ -167,7 +167,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].PSObject.Properties.Name | Should -Not -Contain 'MailNickname'
         $rows[0].PSObject.Properties.Name | Should -Not -Contain 'UserPrincipalName'
@@ -181,7 +181,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].PSObject.Properties.Name | Should -Not -Contain 'MailNickname'
     }
@@ -194,7 +194,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows[0].PSObject.Properties.Name | Should -Not -Contain 'LegacyEmployeeId'
         $rows[0].FirstName | Should -Be 'Ada'
@@ -209,7 +209,7 @@ Describe 'Task 3 Sub-task H - Import-ProvisioningCsv success scenarios' {
         ) -join "`n"
         Write-ProvisioningCsvUtf8NoBom -Path $csvPath -Content $content
 
-        $rows = Get-ImportedProvisioningRows -CsvPath $csvPath
+        $rows = Import-ProvisioningCsvFromTestPath -CsvPath $csvPath
 
         $rows.Count | Should -Be 1
         $rows[0].FirstName | Should -Be 'Grace'
