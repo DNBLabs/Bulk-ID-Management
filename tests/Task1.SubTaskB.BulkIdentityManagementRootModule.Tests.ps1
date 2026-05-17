@@ -35,11 +35,11 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
         $text | Should -Match 'CONTEXT\.md'
     }
 
-    It 'imports the root script module without exporting public commands' {
+    It 'imports the root script module with Import-ProvisioningCsv as the only exported function' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
-            $moduleInfo.ExportedFunctions.Count | Should -Be 0
+            @($moduleInfo.ExportedFunctions.Keys) | Should -BeExactly @('Import-ProvisioningCsv')
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
             $moduleInfo.ExportedAliases.Count | Should -Be 0
         }

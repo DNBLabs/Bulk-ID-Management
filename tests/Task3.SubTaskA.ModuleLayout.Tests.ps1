@@ -45,19 +45,6 @@ Describe 'Task 3 Sub-task A - BulkIdentityManagement CSV module layout' {
         $privateIndex | Should -BeLessThan $publicIndex
     }
 
-    It 'imports the root script module without exporting public commands' {
-        $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
-        $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
-        try {
-            $moduleInfo.ExportedFunctions.Count | Should -Be 0
-            $moduleInfo.ExportedCmdlets.Count | Should -Be 0
-            $moduleInfo.ExportedAliases.Count | Should -Be 0
-        }
-        finally {
-            Remove-Module -ModuleInfo $moduleInfo -Force -ErrorAction SilentlyContinue
-        }
-    }
-
     It 'loads canonical header constants into module scope on import' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force

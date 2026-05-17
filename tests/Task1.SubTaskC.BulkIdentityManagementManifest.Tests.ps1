@@ -5,7 +5,7 @@
 .DESCRIPTION
     Validates manifest presence, metadata contract (PowerShell 7.2+, Core edition, CONTEXT narrative),
     exact rollup Microsoft.Graph pin aligned with docs/tasks/MicrosoftGraph.psgallery.version.txt,
-    explicit empty export lists, a stable GUID, and absence of a root requirements.psd1 second authority.
+    explicit non-wildcard export lists, a stable GUID, and absence of a root requirements.psd1 second authority.
     Security-oriented checks cover empty optional load surfaces (ScriptsToProcess, NestedModules,
     RequiredAssemblies) and reject high-signal secret material patterns in tracked manifest text.
     Test-ModuleManifest with RequiredModules resolution is enforced in CI by .github/scripts/Invoke-ModuleManifestCI.ps1.
@@ -67,9 +67,9 @@ Describe 'Task 1 Sub-task C - BulkIdentityManagement module manifest' {
         { [guid]::Parse($data.GUID) } | Should -Not -Throw
     }
 
-    It 'keeps FunctionsToExport, CmdletsToExport, AliasesToExport, and VariablesToExport empty' {
+    It 'exports Import-ProvisioningCsv only and keeps cmdlets, aliases, and variables empty' {
         $data = Import-PowerShellDataFile -Path $Psd1Path
-        $data.FunctionsToExport.Count | Should -Be 0
+        @($data.FunctionsToExport) | Should -BeExactly @('Import-ProvisioningCsv')
         $data.CmdletsToExport.Count | Should -Be 0
         $data.AliasesToExport.Count | Should -Be 0
         $data.VariablesToExport.Count | Should -Be 0
