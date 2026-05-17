@@ -14,7 +14,7 @@
     [string[]] Physical lines in file order.
 
 .NOTES
-    Does not parse CSV fields; see Get-ProvisioningCsvRecord in a later task.
+    Does not parse CSV fields; see Get-ProvisioningCsvLogicalRecords.
     Maximum file size is 10 MB to limit memory use on untrusted paths.
 #>
 
