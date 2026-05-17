@@ -100,12 +100,13 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Implement a private helper that reads the file at **`-Path`**, accepts UTF-8 with optional BOM, rejects invalid UTF-8 byte sequences, and returns content suitable for line/record parsing (e.g. array of physical lines or a single string plus line breaks). Throw clear encoding errors (terminating).
 
 **Acceptance criteria:**
-- [ ] Valid UTF-8 without BOM reads successfully.
-- [ ] UTF-8 with BOM reads successfully (BOM not part of first header cell).
-- [ ] Invalid UTF-8 bytes cause terminating failure with an encoding-oriented message.
+- [x] Valid UTF-8 without BOM reads successfully. — `Read-ProvisioningCsvUtf8` returns physical lines via `Task3.SubTaskB.Utf8Read.Tests.ps1`.
+- [x] UTF-8 with BOM reads successfully (BOM not part of first header cell). — BOM stripped before decode; first line has no U+FEFF.
+- [x] Invalid UTF-8 bytes cause terminating failure with an encoding-oriented message. — Strict `UTF8Encoding` throws wrapped `InvalidOperationException` citing UTF-8.
 
 **Verification:**
-- [ ] Covered by **Sub-task H/I** Pester fixtures (binary/byte patterns or known-bad files in **TestDrive**).
+- [x] Covered by **Sub-task H/I** Pester fixtures (binary/byte patterns or known-bad files in **TestDrive**). — Sub-task B tests use **TestDrive** fixtures; H/I may extend coverage later.
+- [x] Security: **LiteralPath** leaf check, post-resolve leaf re-check, 10 MB max file size, encoding errors without inner exception leakage (**`Task3.SubTaskB.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task A
 
