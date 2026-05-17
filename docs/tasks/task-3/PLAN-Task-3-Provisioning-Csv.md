@@ -128,7 +128,7 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 - [x] Each record exposes **start line number** (1-based physical line of record start). — `StartLineNumber` on each logical record object.
 
 **Verification:**
-- [ ] **Sub-task I** includes quoted-field and malformed-parse cases via **`Import-ProvisioningCsv`**.
+- [x] **Sub-task I** includes quoted-field and malformed-parse cases via **`Import-ProvisioningCsv`**. — `Task3.ProvisioningCsv.Failure.Tests.ps1` (malformed quoting).
 - [x] Optional: one focused **It** with inline CSV text if it reduces flake vs file fixtures. — `Task3.SubTaskC.CsvRecordParser.Tests.ps1` uses inline **PhysicalLines** arrays.
 - [x] Security: comma-only (no `Import-Csv`/delimiter sniff), safe malformed-parse errors, 256-field cap per record, parser not exported (**`Task3.SubTaskC.Security.Tests.ps1`**).
 
@@ -155,7 +155,7 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 - [x] Header ` Department` (trimmed) matches **Department**. — Header cell trim before canonical lookup.
 
 **Verification:**
-- [ ] **Sub-task I** header-focused **Pester** cases.
+- [x] **Sub-task I** header-focused **Pester** cases. — `Task3.ProvisioningCsv.Failure.Tests.ps1` (missing/duplicate/wrong-case headers).
 - [x] Security: safe header errors, duplicate unknown columns, 256-field cap, not exported (**`Task3.SubTaskD.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task C
@@ -269,16 +269,18 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Add **`tests/Task3.ProvisioningCsv.Failure.Tests.ps1`**. Cover: missing header; duplicate header; wrong-case header; empty required cell (message includes line number); invalid UTF-8; malformed parse; semicolon-separated misfile (fails headers); header-only / all-blank rows; throw leaves pipeline empty (**`Should -Throw`** + no output).
 
 **Acceptance criteria:**
-- [ ] All failure tests pass in **pwsh** without Graph.
-- [ ] Row-level errors assert line number appears in exception message where stable.
+- [x] All failure tests pass in **pwsh** without Graph. — **`Task3.ProvisioningCsv.Failure.Tests.ps1`** (10 scenarios via **`Import-ProvisioningCsv`**).
+- [x] Row-level errors assert line number appears in exception message where stable. — Empty required cell and malformed quoting cite physical line numbers.
 
 **Verification:**
-- [ ] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task3.ProvisioningCsv.Failure.Tests.ps1' -CI"`
+- [x] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task3.ProvisioningCsv.Failure.Tests.ps1' -CI"` — Verified locally (**10/10** pass).
+- [x] Security: fail-closed pipeline on failures, safe errors without inner-exception or cross-cell leakage, `.psm1` import only (**`Task3.ProvisioningCsv.Failure.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task G (may run parallel with **H** after **G**)
 
 **Files likely touched:**
 - `tests/Task3.ProvisioningCsv.Failure.Tests.ps1`
+- `tests/Task3.ProvisioningCsv.Failure.Security.Tests.ps1`
 
 **Estimated scope:** S
 
