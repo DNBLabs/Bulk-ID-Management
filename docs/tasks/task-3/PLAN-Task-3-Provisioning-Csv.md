@@ -203,8 +203,8 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 - [x] Missing file path handled with standard parameter/file error before contract validation (acceptable). — `FileNotFoundException` from UTF-8 read; no pipeline output.
 
 **Verification:**
-- [ ] **Sub-task H** end-to-end **Pester** on **`Import-ProvisioningCsv`**.
-- [ ] Manual: **`Import-ProvisioningCsv -Path`** on a tiny good CSV and a bad CSV in **pwsh**.
+- [x] **Sub-task H** end-to-end **Pester** on **`Import-ProvisioningCsv`**. — `Task3.ProvisioningCsv.Success.Tests.ps1`.
+- [x] Manual: **`Import-ProvisioningCsv -Path`** on a tiny good CSV and a bad CSV in **pwsh**. — `Task3.SubTaskJ.Closure.Tests.ps1` smoke scenarios.
 - [x] Security: fail-closed pipeline, safe encoding/parse errors, no Graph in import script (**`Task3.SubTaskF.Security.Tests.ps1`**).
 
 **Dependencies:** Sub-task E
@@ -293,14 +293,14 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 **Description:** Run full Task 3 **Pester** subset + **PSScriptAnalyzer** on new scripts. Manual smoke (good/bad CSV). Update **`docs/IMPLEMENTATION-PLAN.md`** Task 3 acceptance/verification checkboxes. Add **`docs/tasks/task-3/`** completion notes if useful. Do **not** check Task 4+ boxes.
 
 **Acceptance criteria:**
-- [ ] Parent plan Task 3 acceptance criteria satisfied (headers before rows, UTF-8/BOM, clear errors, tests pass).
-- [ ] No Task 4+ code or tests introduced.
-- [ ] Issue **#2** can move to review/close per team process.
+- [x] Parent plan Task 3 acceptance criteria satisfied (headers before rows, UTF-8/BOM, clear errors, tests pass). — **IMPLEMENTATION-PLAN** Task 3 acceptance and verification updated.
+- [x] No Task 4+ code or tests introduced. — No `Task4*.Tests.ps1`; Task 4 parent checkboxes remain open.
+- [x] Issue **#2** can move to review/close per team process. — CSV contract slice complete pending maintainer review.
 
 **Verification:**
-- [ ] `Invoke-Pester` Task 3 tests green.
-- [ ] Manual: good + bad CSV per implementation plan.
-- [ ] Quick review: CSV error messages human-readable.
+- [x] `Invoke-Pester` Task 3 tests green. — `tests/Task3.*.Tests.ps1` (**117/117** pass).
+- [x] Manual: good + bad CSV per implementation plan. — `Task3.SubTaskJ.Closure.Tests.ps1` smoke scenarios.
+- [x] Quick review: CSV error messages human-readable. — Header and row errors cite canonical column names and physical line numbers.
 
 **Dependencies:** Sub-tasks H, I
 
@@ -321,15 +321,15 @@ Sub-task A: Public/Private layout + constants + dot-source wiring
 - [x] Proceed to header/row logic only when parser is stable. — Parser unit-tested; ready for Sub-task D.
 
 ### Checkpoint: After Sub-task G
-- [ ] **`Import-ProvisioningCsv`** callable from imported module.
-- [ ] Good minimal CSV returns ≥1 row with expected properties.
-- [ ] Bad header CSV throws.
-- [ ] No Graph calls in CSV code paths.
+- [x] **`Import-ProvisioningCsv`** callable from imported module. — `Task3.SubTaskG.ModuleExport.Tests.ps1`.
+- [x] Good minimal CSV returns ≥1 row with expected properties. — Success and closure smoke tests.
+- [x] Bad header CSV throws. — Failure and closure smoke tests.
+- [x] No Graph calls in CSV code paths. — Sub-task A–G and provisioning CSV security suites.
 
 ### Checkpoint: Task 3 complete (after Sub-task J)
-- [ ] **`Invoke-Pester`** passes for **H** + **I** without live tenant.
-- [ ] **IMPLEMENTATION-PLAN** Task 3 boxes updated.
-- [ ] Ready for **Task 4** (depends on stable **provisioning row** shape)—do **not** start Task 4 in this delivery.
+- [x] **`Invoke-Pester`** passes for **H** + **I** without live tenant. — Success, failure, and security suites (**28** contract tests) plus full Task 3 subset (**117** tests).
+- [x] **IMPLEMENTATION-PLAN** Task 3 boxes updated. — Parent Task 3 acceptance and verification marked complete.
+- [x] Ready for **Task 4** (depends on stable **provisioning row** shape)—do **not** start Task 4 in this delivery. — Row shape fixed via `Import-ProvisioningCsv`; Task 4 remains unstarted.
 
 ---
 

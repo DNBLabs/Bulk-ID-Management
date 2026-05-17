@@ -107,13 +107,13 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Implement parsing and validation for **comma-separated**, **UTF-8** input with optional **UTF-8 BOM**, header row, required columns **FirstName**, **LastName**, **Department**; fail with clear errors when missing or non-parseable. Emit structured **provisioning row** objects for downstream modules.
 
 **Acceptance criteria:**
-- [ ] Required headers validated before row iteration.
-- [ ] UTF-8 with and without BOM reads correctly.
-- [ ] Malformed files produce clear, actionable errors (no partial silent apply).
+- [x] Required headers validated before row iteration. — Header map validated before row materialization in `Import-ProvisioningCsv`.
+- [x] UTF-8 with and without BOM reads correctly. — `Task3.ProvisioningCsv.Success.Tests.ps1` (BOM and no-BOM fixtures).
+- [x] Malformed files produce clear, actionable errors (no partial silent apply). — `Task3.ProvisioningCsv.Failure.Tests.ps1`; fail-closed with no pipeline output on error.
 
 **Verification:**
-- [ ] Tests pass: `Invoke-Pester` (or `pwsh -c "Invoke-Pester 'tests/...'"`) scoped to CSV contract tests.
-- [ ] Manual: Run validator against a tiny good CSV and a bad CSV.
+- [x] Tests pass: `Invoke-Pester` (or `pwsh -c "Invoke-Pester 'tests/...'"`) scoped to CSV contract tests. — `tests/Task3.*.Tests.ps1` (**117** tests).
+- [x] Manual: Run validator against a tiny good CSV and a bad CSV. — `Task3.SubTaskJ.Closure.Tests.ps1` smoke scenarios.
 
 **Dependencies:** Task 1
 
