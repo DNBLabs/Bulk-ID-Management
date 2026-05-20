@@ -57,4 +57,5 @@ $dotSourceModuleChildScripts = {
 Export-ModuleMember -Function @(
     'Import-ProvisioningCsv'
     'Get-MappedProvisioningIdentity'
+    'Get-DerivedUserPrincipalName'
 )

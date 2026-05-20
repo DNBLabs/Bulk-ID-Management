@@ -43,3 +43,39 @@ $MaxProvisioningMailNicknameLength = 64
     '',
     Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
 $MaxProvisioningMailNicknameInputLength = 512
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$MaxProvisioningTenantDomainSuffixLength = 255
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$MaxProvisioningUserPrincipalNameLength = 113
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$MaxProvisioningCsvUserPrincipalNameInputLength = 113
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$MinProvisioningMaximumUpnCandidates = 1
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$MaxProvisioningMaximumUpnCandidates = 99
+
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'Constants are consumed when dot-sourced into the BulkIdentityManagement module scope.')]
+$DefaultProvisioningMaximumUpnCandidates = 10

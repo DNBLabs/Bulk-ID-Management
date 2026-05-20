@@ -57,13 +57,14 @@ function Test-ProvisioningIdentityRowBoundary {
     Test-ProvisioningIdentityStringFieldLength -FieldName 'LastName' -Value $ProvisioningRow.LastName -MaximumLength $MaxProvisioningIdentitySurnameLength -SourceLineNumber $lineNumber
     Test-ProvisioningIdentityStringFieldLength -FieldName 'Department' -Value $ProvisioningRow.Department -MaximumLength $MaxProvisioningIdentityDisplayNameLength -SourceLineNumber $lineNumber
 
-    foreach ($optionalName in @('GivenName', 'Surname', 'DisplayName', 'MailNickname')) {
+    foreach ($optionalName in @('GivenName', 'Surname', 'DisplayName', 'MailNickname', 'UserPrincipalName')) {
         if ($ProvisioningRow.PSObject.Properties.Name -contains $optionalName) {
             $maxLength = switch ($optionalName) {
                 'GivenName' { $MaxProvisioningIdentityGivenNameLength }
                 'Surname' { $MaxProvisioningIdentitySurnameLength }
                 'DisplayName' { $MaxProvisioningIdentityDisplayNameLength }
                 'MailNickname' { $MaxProvisioningMailNicknameInputLength }
+                'UserPrincipalName' { $MaxProvisioningCsvUserPrincipalNameInputLength }
             }
             Test-ProvisioningIdentityStringFieldLength -FieldName $optionalName -Value $ProvisioningRow.$optionalName -MaximumLength $maxLength -SourceLineNumber $lineNumber
         }

@@ -80,10 +80,4 @@ Describe 'Task 4 Sub-task J - closure checklist verification' {
         $implementationPlan | Should -Match '(?m)^- \[x\] Tests pass: Pester for name mapping and nickname cases\.'
     }
 
-    It 'does not mark Task 5 acceptance complete or introduce Task 5 test files' {
-        $implementationPlan = Get-Content -LiteralPath $script:ImplementationPlanPath -Raw
-        $implementationPlan | Should -Match '(?m)^- \[ \] Full UPN from CSV overrides nickname\+suffix path when \*\*UserPrincipalName\*\* column present\.'
-        Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Task5*.Tests.ps1' -File -ErrorAction SilentlyContinue |
-            Should -BeNullOrEmpty
-    }
 }

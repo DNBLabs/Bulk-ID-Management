@@ -152,12 +152,12 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Build proposed **UserPrincipalName** from row + configured **tenant domain suffix** (non-secret parameter). Implement numeric suffix strategy when an injectable **Test-UpnExists** (or equivalent) returns true, up to a documented cap; when cap exceeded, surface a failure suitable for **row outcome**.
 
 **Acceptance criteria:**
-- [ ] Full UPN from CSV overrides nickname+suffix path when **UserPrincipalName** column present.
-- [ ] Collision loop uses injectable predicate (no live Graph in unit tests).
-- [ ] Bounded attempts: aligns with **graph transient policy** spirit for apply-time (unit test the bound).
+- [x] Full UPN from CSV overrides nickname+suffix path when **UserPrincipalName** column present. — `Get-DerivedUserPrincipalName` + `Task5.UpnCsvOverride.Tests.ps1`.
+- [x] Collision loop uses injectable predicate (no live Graph in unit tests). — **`-UpnExists`** script block; `Task5.UpnCollision.Tests.ps1`.
+- [x] Bounded attempts: aligns with **graph transient policy** spirit for apply-time (unit test the bound). — **`-MaximumUpnCandidates`**; `Task5.UpnCollisionLimits.Tests.ps1`.
 
 **Verification:**
-- [ ] Tests pass: Pester for suffix progression with stubbed exists-check.
+- [x] Tests pass: Pester for suffix progression with stubbed exists-check. — `tests/Task5*.Tests.ps1` (**31** tests, includes security suite).
 
 **Dependencies:** Task 4
 

@@ -15,12 +15,13 @@ BeforeAll {
     $script:ExpectedPublicFunctions = @(
         'Import-ProvisioningCsv'
         'Get-MappedProvisioningIdentity'
+        'Get-DerivedUserPrincipalName'
     )
 }
 
 Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
 
-    It 'lists Task 3 and Task 4 public functions in FunctionsToExport' {
+    It 'lists Task 3, Task 4, and Task 5 public functions in FunctionsToExport' {
         $data = Import-PowerShellDataFile -Path $script:Psd1Path
         @($data.FunctionsToExport) | Should -BeExactly @($script:ExpectedPublicFunctions)
         $data.CmdletsToExport.Count | Should -Be 0
@@ -37,11 +38,12 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
         }
     }
 
-    It 'exposes Task 3 and Task 4 public functions when importing the root script module' {
+    It 'exposes Task 3, Task 4, and Task 5 public functions when importing the root script module' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $script:Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
             @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'
             )
@@ -89,6 +91,7 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
 
         $manifestInfo = Test-ModuleManifest -Path $script:Psd1Path -ErrorAction Stop
         @($manifestInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+            'Get-DerivedUserPrincipalName'
             'Get-MappedProvisioningIdentity'
             'Import-ProvisioningCsv'
         )

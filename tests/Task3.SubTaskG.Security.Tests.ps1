@@ -16,6 +16,7 @@ BeforeAll {
     $script:ExpectedPublicFunctions = @(
         'Import-ProvisioningCsv'
         'Get-MappedProvisioningIdentity'
+        'Get-DerivedUserPrincipalName'
     )
 }
 
@@ -109,6 +110,7 @@ Describe 'Task 3 Sub-task G - export wiring security' {
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
             @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'
             )
