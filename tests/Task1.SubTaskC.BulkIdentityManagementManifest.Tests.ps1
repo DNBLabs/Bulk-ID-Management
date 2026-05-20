@@ -67,7 +67,7 @@ Describe 'Task 1 Sub-task C - BulkIdentityManagement module manifest' {
         { [guid]::Parse($data.GUID) } | Should -Not -Throw
     }
 
-    It 'exports Task 3–5 public functions and keeps cmdlets, aliases, and variables empty' {
+    It 'exports Task 3-5 public functions and keeps cmdlets, aliases, and variables empty' {
         $data = Import-PowerShellDataFile -Path $Psd1Path
         @($data.FunctionsToExport) | Should -BeExactly @(
             'Import-ProvisioningCsv'
