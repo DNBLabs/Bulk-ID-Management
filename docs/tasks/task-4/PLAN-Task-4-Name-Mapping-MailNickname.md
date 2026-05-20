@@ -4,7 +4,7 @@
 
 **Scope lock:** This plan decomposes **Implementation Plan Task 4** only. It does **not** include **UserPrincipalName** composition or collision suffix (**Task 5**), **IT department rule** (**Task 6**), **Graph gateway** or auth (**Tasks 7–10**), orchestration/reporting (**Tasks 11–13**), entry script (**Task 13**), CI workflow completion (**Task 14**), sample CSV/runbook (**Tasks 16–17**), or any **Microsoft Graph** calls.
 
-**Repo reality (planning snapshot):** **BulkIdentityManagement** exports **`Import-ProvisioningCsv`** only. **Public/** and **Private/** exist with CSV contract scripts. Task 3 **Pester** suites dot-source or import **`.psm1`** without **`Connect-MgGraph`**—Task 4 tests must follow the same pattern.
+**Repo reality (closure snapshot):** **BulkIdentityManagement** exports **`Import-ProvisioningCsv`** and **`Get-MappedProvisioningIdentity`**. **Private/** holds name-mapping and nickname scripts; **Public/** holds the mapped-identity cmdlet. Task 4 **Pester** imports **`.psm1`** without **`Connect-MgGraph`** (same pattern as Task 3).
 
 ---
 
@@ -83,12 +83,12 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add a private function (e.g. **`Format-ProvisioningIdentityNamePart`**) that trims leading/trailing whitespace and collapses internal runs of whitespace to a single space. Used by name mapping and nickname base building. No Graph; no row awareness.
 
 **Acceptance criteria:**
-- [ ] Leading/trailing whitespace removed.
-- [ ] Internal runs of spaces/tabs collapsed to one ASCII space.
-- [ ] Empty or whitespace-only input returns empty string (callers validate required row fields separately).
+- [x] Leading/trailing whitespace removed. — `Format-ProvisioningIdentityNamePart.ps1`.
+- [x] Internal runs of spaces/tabs collapsed to one ASCII space. — Regex collapse in same helper.
+- [x] Empty or whitespace-only input returns empty string (callers validate required row fields separately). — Used by name mapping; row required-field checks in boundary helper.
 
 **Verification:**
-- [ ] Exercised indirectly via **Sub-task F** once **D** exists; optional minimal direct tests only if needed for debugging (prefer public surface).
+- [x] Exercised indirectly via **Sub-task F** once **D** exists; optional minimal direct tests only if needed for debugging (prefer public surface). — `Task4.NameMapping.Tests.ps1` trim/collapse cases.
 
 **Dependencies:** None (Task 3 complete)
 
@@ -104,13 +104,13 @@ Sub-task A: Private trim/collapse helper
 **Description:** Implement private **`Get-ProvisioningNameMappingFromRow`** (example name) that accepts a **provisioning row** and returns a small hashtable or ordered dict with **GivenName**, **Surname**, **DisplayName** per **CONTEXT**: defaults from **FirstName**/**LastName**; overrides when **GivenName** / **Surname** / **DisplayName** properties exist on the row; **DisplayName** default from **FirstName** + space + **LastName** (not from mapped **GivenName**); diacritics preserved; trim/collapse on all outputs.
 
 **Acceptance criteria:**
-- [ ] Default mapping: **GivenName** ← **FirstName**, **Surname** ← **LastName**, **DisplayName** ← formatted **FirstName** + **LastName**.
-- [ ] **GivenName** / **Surname** / **DisplayName** row overrides replace corresponding field when property present.
-- [ ] **Robert** + row **GivenName** `Bob` → **GivenName** `Bob`, **DisplayName** `Robert Smith` (trimmed/collapsed).
-- [ ] Diacritics unchanged on mapped name fields (e.g. **José**, **García**).
+- [x] Default mapping: **GivenName** ← **FirstName**, **Surname** ← **LastName**, **DisplayName** ← formatted **FirstName** + **LastName**. — `Get-ProvisioningNameMappingFromRow.ps1`.
+- [x] **GivenName** / **Surname** / **DisplayName** row overrides replace corresponding field when property present. — Override branches in same helper.
+- [x] **Robert** + row **GivenName** `Bob` → **GivenName** `Bob`, **DisplayName** `Robert Smith` (trimmed/collapsed). — `Task4.NameMapping.Tests.ps1` and Sub-task J smoke.
+- [x] Diacritics unchanged on mapped name fields (e.g. **José**, **García**). — `Task4.NameMapping.Tests.ps1` diacritic case.
 
 **Verification:**
-- [ ] Covered by **Sub-task F** via **`Get-MappedProvisioningIdentity`**.
+- [x] Covered by **Sub-task F** via **`Get-MappedProvisioningIdentity`**. — `Task4.NameMapping.Tests.ps1`.
 
 **Dependencies:** Sub-task A
 
@@ -126,13 +126,13 @@ Sub-task A: Private trim/collapse helper
 **Description:** Implement private **`Get-NormalizedProvisioningMailNickname`** (example name) with two entry paths: (1) **base string** already dot-joined from mapped names; (2) **CSV override** string. Apply pipeline: lowercase; **ß→ss** before or after Form D (document order in code comment only if non-obvious); Form D + strip non-spacing marks; remove all spaces; filter to **`[a-z0-9.-]`**; collapse repeated **`.`** and **`-`**; trim leading/trailing **`.`** and **`-`**; validate non-empty and at least one **`a-z`**. On validation failure, throw **`System.InvalidOperationException`** including **SourceLineNumber** parameter passed in from caller.
 
 **Acceptance criteria:**
-- [ ] Derived base: mapped **GivenName** + **`.`** + mapped **Surname** (parts formatted with Sub-task A) before pipeline.
-- [ ] CSV **MailNickname** on row uses same pipeline (e.g. `ADA.LOVELACE` → `ada.lovelace`).
-- [ ] PRD reference table cases pass (José/García, Mary Jane, Bob/Robert, O'Brien, Jean-Luc, Björn/Weiß).
-- [ ] Invalid values (`!!!`, `---`, punctuation-only) throw with line number in message.
+- [x] Derived base: mapped **GivenName** + **`.`** + mapped **Surname** (parts formatted with Sub-task A) before pipeline. — `Get-NormalizedProvisioningMailNickname.ps1` derive path.
+- [x] CSV **MailNickname** on row uses same pipeline (e.g. `ADA.LOVELACE` → `ada.lovelace`). — Override path in same function.
+- [x] PRD reference table cases pass (José/García, Mary Jane, Bob/Robert, O'Brien, Jean-Luc, Björn/Weiß). — `Task4.MailNickname.Tests.ps1` and name-mapping tests.
+- [x] Invalid values (`!!!`, `---`, punctuation-only) throw with line number in message. — `Task4.MappingFailures.Tests.ps1`.
 
 **Verification:**
-- [ ] Covered by **Sub-task G** and **H** via public cmdlet.
+- [x] Covered by **Sub-task G** and **H** via public cmdlet. — `Task4.MailNickname.Tests.ps1`, `Task4.MappingFailures.Tests.ps1`.
 
 **Dependencies:** Sub-task A (formatting parts); **B** provides mapped names for derive path
 
@@ -150,13 +150,13 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`Public/Get-MappedProvisioningIdentity.ps1`**. Validate **ProvisioningRow** has **SourceLineNumber**, **FirstName**, **LastName**, **Department** (throw **`ArgumentException`** or **`InvalidOperationException`** for malformed row object—distinct message from nickname validation). Call **B** then **C** (derive vs CSV **MailNickname** branch). Return new **PSCustomObject** with **SourceLineNumber**, **GivenName**, **Surname**, **DisplayName**, **MailNickname**. Do not mutate **ProvisioningRow**.
 
 **Acceptance criteria:**
-- [ ] Success returns all five properties on a new object.
-- [ ] Input row property values unchanged after call (reference same object; compare **FirstName** / optional props).
-- [ ] Row with **MailNickname** property uses override path; row without property derives nickname.
-- [ ] Invalid nickname throws **`System.InvalidOperationException`** citing physical line (e.g. `physical line 4`).
+- [x] Success returns all five properties on a new object. — `Get-MappedProvisioningIdentity.ps1`.
+- [x] Input row property values unchanged after call (reference same object; compare **FirstName** / optional props). — `Task4.MappingFailures.Tests.ps1` immutability case.
+- [x] Row with **MailNickname** property uses override path; row without property derives nickname. — `Task4.MailNickname.Tests.ps1`.
+- [x] Invalid nickname throws **`System.InvalidOperationException`** citing physical line (e.g. `physical line 4`). — `Task4.MappingFailures.Tests.ps1` and Sub-task J smoke.
 
 **Verification:**
-- [ ] **F**, **G**, **H** green in **pwsh**.
+- [x] **F**, **G**, **H** green in **pwsh**. — `tests/Task4*.Tests.ps1` (**34** tests including security suite).
 
 **Dependencies:** Sub-tasks B, C
 
@@ -172,13 +172,13 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`Get-MappedProvisioningIdentity`** to **`BulkIdentityManagement.psd1`** **FunctionsToExport**. Update **`BulkIdentityManagement.psm1`** **`Export-ModuleMember`** to include both **`Import-ProvisioningCsv`** and **`Get-MappedProvisioningIdentity`**. Ensure new scripts are dot-sourced automatically via existing **Private/** / **Public/** glob (no Graph).
 
 **Acceptance criteria:**
-- [ ] **FunctionsToExport** lists both CSV import and mapped identity commands.
-- [ ] **`Export-ModuleMember`** matches manifest.
-- [ ] Importing **`.psm1`** in **pwsh** exposes both commands without Graph auth.
+- [x] **FunctionsToExport** lists both CSV import and mapped identity commands. — `BulkIdentityManagement.psd1`.
+- [x] **`Export-ModuleMember`** matches manifest. — `BulkIdentityManagement.psm1`.
+- [x] Importing **`.psm1`** in **pwsh** exposes both commands without Graph auth. — `Task3.SubTaskG.ModuleExport.Tests.ps1`, `Task4.SubTaskI.ModuleExport.Tests.ps1`.
 
 **Verification:**
-- [ ] **Sub-task I** manifest tests pass.
-- [ ] Manual: `Import-Module ./BulkIdentityManagement.psm1 -Force; Get-Command Get-MappedProvisioningIdentity`
+- [x] **Sub-task I** manifest tests pass. — `Task4.SubTaskI.ModuleExport.Tests.ps1`.
+- [x] Manual: `Import-Module ./BulkIdentityManagement.psm1 -Force; Get-Command Get-MappedProvisioningIdentity` — Covered by export Pester suites and CI module-manifest job.
 
 **Dependencies:** Sub-task D
 
@@ -197,12 +197,12 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`tests/Task4.NameMapping.Tests.ps1`**. Build **provisioning row** **PSCustomObject** fixtures in tests (same property names as Task 3). Assert **GivenName**, **Surname**, **DisplayName** via **`Get-MappedProvisioningIdentity`** (observable outputs only). Include: minimal row; **GivenName** / **Surname** / **DisplayName** overrides; Robert/Bob display rule; diacritics preserved on name fields; trim/collapse on double spaces.
 
 **Acceptance criteria:**
-- [ ] All scenarios in PRD “name mapping” section covered.
-- [ ] No assertions on private function names.
-- [ ] **`Invoke-Pester`** passes without tenant credentials.
+- [x] All scenarios in PRD “name mapping” section covered. — `Task4.NameMapping.Tests.ps1`.
+- [x] No assertions on private function names. — Tests call `Get-MappedProvisioningIdentity` only.
+- [x] **`Invoke-Pester`** passes without tenant credentials. — Green in local and CI full suite.
 
 **Verification:**
-- [ ] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.NameMapping.Tests.ps1' -CI"`
+- [x] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.NameMapping.Tests.ps1' -CI"` — Part of `tests/Task4*.Tests.ps1`.
 
 **Dependencies:** Sub-task E
 
@@ -218,11 +218,11 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`tests/Task4.MailNickname.Tests.ps1`**. Assert **MailNickname** on mapped object: PRD reference table, CSV override normalization, hyphen retention, apostrophe stripping, `John..Smith` collapse, multi-word first name. Use stable row **SourceLineNumber** values for failure tests delegated to **H** where appropriate.
 
 **Acceptance criteria:**
-- [ ] PRD nickname table and override cases covered.
-- [ ] **`Invoke-Pester`** passes without Graph.
+- [x] PRD nickname table and override cases covered. — `Task4.MailNickname.Tests.ps1`.
+- [x] **`Invoke-Pester`** passes without Graph. — Green in local and CI.
 
 **Verification:**
-- [ ] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.MailNickname.Tests.ps1' -CI"`
+- [x] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.MailNickname.Tests.ps1' -CI"` — Part of `tests/Task4*.Tests.ps1`.
 
 **Dependencies:** Sub-task E (may run parallel with **F** after **E**)
 
@@ -238,11 +238,11 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`tests/Task4.MappingFailures.Tests.ps1`**. Cover: invalid **MailNickname** (throw, message contains physical line); malformed row missing required properties; **`Should -Throw`**; assert input row unchanged after failed/successful map. Optional: row missing **MailNickname** property vs empty—only property absence triggers derive (Task 3 omits property when blank).
 
 **Acceptance criteria:**
-- [ ] Failure tests pass; messages cite **SourceLineNumber** where stable.
-- [ ] Immutability test compares row before/after.
+- [x] Failure tests pass; messages cite **SourceLineNumber** where stable. — `Task4.MappingFailures.Tests.ps1`.
+- [x] Immutability test compares row before/after. — Same suite.
 
 **Verification:**
-- [ ] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.MappingFailures.Tests.ps1' -CI"`
+- [x] `pwsh -NoProfile -Command "Invoke-Pester -Path 'tests/Task4.MappingFailures.Tests.ps1' -CI"` — Part of `tests/Task4*.Tests.ps1`.
 
 **Dependencies:** Sub-task E (parallel with **F**, **G** after **E**)
 
@@ -258,12 +258,12 @@ Sub-task A: Private trim/collapse helper
 **Description:** Add **`tests/Task4.SubTaskI.ModuleExport.Tests.ps1`** (or extend Task 1 manifest tests minimally): **FunctionsToExport** contains **`Get-MappedProvisioningIdentity`**. Add one integration test: small UTF-8 CSV in **TestDrive** → **`Import-ProvisioningCsv`** → **`Get-MappedProvisioningIdentity`** on first row (accented or override case). Scan new Task 4 scripts for **Microsoft.Graph** / **`Connect-MgGraph`** (mirror Task 3 Sub-task A).
 
 **Acceptance criteria:**
-- [ ] Manifest export list includes new function.
-- [ ] Import→Map smoke passes.
-- [ ] No Graph references in Task 4 source files.
+- [x] Manifest export list includes new function. — `Task4.SubTaskI.ModuleExport.Tests.ps1`.
+- [x] Import→Map smoke passes. — Accented CSV integration test in same file.
+- [x] No Graph references in Task 4 source files. — Static scan in same file.
 
 **Verification:**
-- [ ] `Invoke-Pester` on **Sub-task I** file green.
+- [x] `Invoke-Pester` on **Sub-task I** file green. — Also `Task4.Mapping.Security.Tests.ps1` for bounds.
 
 **Dependencies:** Sub-task E
 
