@@ -205,11 +205,11 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Define the minimal set of operations the orchestrator needs: e.g. resolve **UPN** existence, create user (member) with required fields, patch limited attributes for **UpdateExisting**, resolve **IT membership group** by **Object ID**, test membership, add member. Use PowerShell patterns appropriate to the repo (private functions in a **Gateway** submodule or a small class). No Microsoft.Graph calls inside this task—signatures and documentation only.
 
 **Acceptance criteria:**
-- [ ] Orchestrator dependencies are expressible against this contract alone.
-- [ ] All operations are documented as **v1.0** Graph semantics.
+- [x] Orchestrator dependencies are expressible against this contract alone. — `New-FakeProvisioningGraphGateway` stub with six ScriptBlock entries matching orchestrator consumption pattern.
+- [x] All operations are documented as **v1.0** Graph semantics. — Contract documented in CONTEXT.md and source docstring; all six ops map to v1.0 Graph calls.
 
 **Verification:**
-- [ ] Manual: Review interface vs **CONTEXT** (permissions, fields, group resolution by id).
+- [x] Manual: Review interface vs **CONTEXT** (permissions, fields, group resolution by id). — `tests/Task7*.Tests.ps1` (**14** tests: 9 contract + 5 closure).
 
 **Dependencies:** Tasks 4–6 (field names stable)
 

@@ -46,8 +46,4 @@ Describe 'Task 6 closure - IT department rule predicate' {
         $taskPlan | Should -Match '(?m)^- \[x\] `tests/Task6\.DepartmentMatch\.Tests\.ps1` covers 12 scenarios'
     }
 
-    It 'does not introduce Task 7 test files' {
-        Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Task7*.Tests.ps1' -File -ErrorAction SilentlyContinue |
-            Should -BeNullOrEmpty
-    }
 }
