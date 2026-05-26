@@ -94,12 +94,19 @@ Describe 'Connect-ProvisioningGraph security' {
             Mock Connect-MgGraph { throw 'AADSTS error' }
 
             $tempPfx = Join-Path $TestDrive 'dispose-test.pfx'
-            $selfSigned = New-SelfSignedCertificate -DnsName 'test.local' `
-                -CertStoreLocation 'Cert:\CurrentUser\My' -NotAfter (Get-Date).AddMinutes(5)
-            $exported = $selfSigned.Export(
+            $rsa = [System.Security.Cryptography.RSA]::Create(2048)
+            $req = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+                'CN=test.local', $rsa,
+                [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+                [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
+            $cert = $req.CreateSelfSigned(
+                [System.DateTimeOffset]::UtcNow,
+                [System.DateTimeOffset]::UtcNow.AddMinutes(5))
+            $pfxBytes = $cert.Export(
                 [System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, '')
-            [System.IO.File]::WriteAllBytes($tempPfx, $exported)
-            Remove-Item "Cert:\CurrentUser\My\$($selfSigned.Thumbprint)" -Force
+            [System.IO.File]::WriteAllBytes($tempPfx, $pfxBytes)
+            $cert.Dispose()
+            $rsa.Dispose()
 
             $caught = $null
             try {

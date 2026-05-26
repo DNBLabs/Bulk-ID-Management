@@ -145,16 +145,19 @@ Describe 'Connect-ProvisioningGraph' {
                 Mock Connect-MgGraph {}
 
                 $tempPfx = Join-Path $TestDrive 'noprivkey.pfx'
-                $cert = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new()
-                $publicOnly = $cert.RawData
-                if ($null -eq $publicOnly -or $publicOnly.Length -eq 0) {
-                    $selfSigned = New-SelfSignedCertificate -DnsName 'test.local' `
-                        -CertStoreLocation 'Cert:\CurrentUser\My' -NotAfter (Get-Date).AddMinutes(5)
-                    $exported = $selfSigned.Export(
-                        [System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
-                    [System.IO.File]::WriteAllBytes($tempPfx, $exported)
-                    Remove-Item "Cert:\CurrentUser\My\$($selfSigned.Thumbprint)" -Force
-                }
+                $rsa = [System.Security.Cryptography.RSA]::Create(2048)
+                $req = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+                    'CN=test.local', $rsa,
+                    [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+                    [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
+                $cert = $req.CreateSelfSigned(
+                    [System.DateTimeOffset]::UtcNow,
+                    [System.DateTimeOffset]::UtcNow.AddMinutes(5))
+                $publicOnlyBytes = $cert.Export(
+                    [System.Security.Cryptography.X509Certificates.X509ContentType]::Cert)
+                [System.IO.File]::WriteAllBytes($tempPfx, $publicOnlyBytes)
+                $cert.Dispose()
+                $rsa.Dispose()
 
                 {
                     Connect-ProvisioningGraph -TenantId 'a1b2c3d4-e5f6-7890-abcd-ef1234567890' `
@@ -172,12 +175,19 @@ Describe 'Connect-ProvisioningGraph' {
                 Mock Connect-MgGraph {}
 
                 $tempPfx = Join-Path $TestDrive 'good.pfx'
-                $selfSigned = New-SelfSignedCertificate -DnsName 'test.local' `
-                    -CertStoreLocation 'Cert:\CurrentUser\My' -NotAfter (Get-Date).AddMinutes(5)
-                $exported = $selfSigned.Export(
+                $rsa = [System.Security.Cryptography.RSA]::Create(2048)
+                $req = [System.Security.Cryptography.X509Certificates.CertificateRequest]::new(
+                    'CN=test.local', $rsa,
+                    [System.Security.Cryptography.HashAlgorithmName]::SHA256,
+                    [System.Security.Cryptography.RSASignaturePadding]::Pkcs1)
+                $cert = $req.CreateSelfSigned(
+                    [System.DateTimeOffset]::UtcNow,
+                    [System.DateTimeOffset]::UtcNow.AddMinutes(5))
+                $pfxBytes = $cert.Export(
                     [System.Security.Cryptography.X509Certificates.X509ContentType]::Pfx, '')
-                [System.IO.File]::WriteAllBytes($tempPfx, $exported)
-                Remove-Item "Cert:\CurrentUser\My\$($selfSigned.Thumbprint)" -Force
+                [System.IO.File]::WriteAllBytes($tempPfx, $pfxBytes)
+                $cert.Dispose()
+                $rsa.Dispose()
 
                 $t = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
                 $c = 'b2c3d4e5-f6a7-8901-bcde-f12345678901'
