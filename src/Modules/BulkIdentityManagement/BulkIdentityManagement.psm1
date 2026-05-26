@@ -58,4 +58,5 @@ Export-ModuleMember -Function @(
     'Import-ProvisioningCsv'
     'Get-MappedProvisioningIdentity'
     'Get-DerivedUserPrincipalName'
+    'Connect-ProvisioningGraph'
 )

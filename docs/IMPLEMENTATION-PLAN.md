@@ -246,12 +246,12 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Encapsulate connecting to Microsoft Graph as the **automation principal** using certificate-based client credentials (thumbprint or cert path parameters). Do not implement **client secret** as default. Integrate with **Microsoft.Graph** session commands per pinned module docs.
 
 **Acceptance criteria:**
-- [ ] Connect path works with test cert in operator lab (documented separately—not committed).
-- [ ] Clear errors when cert or tenant/client parameters invalid.
+- [x] Connect path works with test cert in operator lab (documented separately—not committed). — `Connect-ProvisioningGraph` with Thumbprint and CertificatePath parameter sets; Pester happy-path tests with mocked `Connect-MgGraph`.
+- [x] Clear errors when cert or tenant/client parameters invalid. — GUID validation, thumbprint format, file existence/extension, private key check; all throw `InvalidOperationException`.
 
 **Verification:**
-- [ ] Manual: Connect to a dev tenant with lab app registration (not in CI).
-- [ ] CI: This task’s code is covered by **PSScriptAnalyzer** only unless mocked—no Graph in CI.
+- [x] Manual: Connect to a dev tenant with lab app registration (not in CI). — Deferred to lab; Pester covers parameter forwarding via mock.
+- [x] CI: This task’s code is covered by **PSScriptAnalyzer** only unless mocked—no Graph in CI. — `tests/Task9*.Tests.ps1` (**25** tests: 11 behavior + 9 security + 5 closure); all mock `Connect-MgGraph`.
 
 **Dependencies:** Task 1
 

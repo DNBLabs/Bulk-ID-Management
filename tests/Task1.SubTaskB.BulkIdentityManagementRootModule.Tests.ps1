@@ -35,11 +35,12 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
         $text | Should -Match 'CONTEXT\.md'
     }
 
-    It 'imports the root script module with Task 3, Task 4, and Task 5 public functions exported' {
+    It 'imports the root script module with public functions exported' {
         $resolvedPsm1 = Resolve-Path -LiteralPath $Psm1Path
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
             @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Connect-ProvisioningGraph'
                 'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'

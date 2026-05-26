@@ -50,8 +50,4 @@ Describe 'Task 8 closure - fake Graph gateway' {
         $taskPlan | Should -Match '(?m)^- \[x\] \*\*J .+ Closure'
     }
 
-    It 'does not introduce Task 9 test files' {
-        Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Task9*.Tests.ps1' -File -ErrorAction SilentlyContinue |
-            Should -BeNullOrEmpty
-    }
 }

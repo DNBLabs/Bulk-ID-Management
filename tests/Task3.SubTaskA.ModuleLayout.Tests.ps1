@@ -60,12 +60,17 @@ Describe 'Task 3 Sub-task A - BulkIdentityManagement CSV module layout' {
     }
 
     It 'does not reference Connect-MgGraph or Import-Module Microsoft.Graph in CSV layout scripts' {
+        $graphAuthFiles = @('Connect-ProvisioningGraph.ps1')
         $paths = @($Psm1Path)
         if (Test-Path -LiteralPath $PrivateDir) {
-            $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File | ForEach-Object { $_.FullName })
+            $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File |
+                Where-Object { $_.Name -notin $graphAuthFiles } |
+                ForEach-Object { $_.FullName })
         }
         if (Test-Path -LiteralPath $PublicDir) {
-            $paths += @(Get-ChildItem -LiteralPath $PublicDir -Filter '*.ps1' -File | ForEach-Object { $_.FullName })
+            $paths += @(Get-ChildItem -LiteralPath $PublicDir -Filter '*.ps1' -File |
+                Where-Object { $_.Name -notin $graphAuthFiles } |
+                ForEach-Object { $_.FullName })
         }
         foreach ($path in $paths) {
             $text = Get-Content -LiteralPath $path -Raw

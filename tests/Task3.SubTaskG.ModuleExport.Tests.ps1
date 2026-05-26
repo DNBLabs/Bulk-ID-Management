@@ -16,6 +16,7 @@ BeforeAll {
         'Import-ProvisioningCsv'
         'Get-MappedProvisioningIdentity'
         'Get-DerivedUserPrincipalName'
+        'Connect-ProvisioningGraph'
     )
 }
 
@@ -43,6 +44,7 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
         $moduleInfo = Import-Module -Name $resolvedPsm1.Path -PassThru -Force
         try {
             @($moduleInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+                'Connect-ProvisioningGraph'
                 'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'
@@ -91,6 +93,7 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
 
         $manifestInfo = Test-ModuleManifest -Path $script:Psd1Path -ErrorAction Stop
         @($manifestInfo.ExportedFunctions.Keys | Sort-Object) | Should -BeExactly @(
+            'Connect-ProvisioningGraph'
             'Get-DerivedUserPrincipalName'
             'Get-MappedProvisioningIdentity'
             'Import-ProvisioningCsv'
