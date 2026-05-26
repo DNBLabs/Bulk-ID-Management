@@ -174,11 +174,11 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Implement case-insensitive match of **Department** to configurable target (default **`IT`**). Single function or cmdlet used by orchestrator and tests.
 
 **Acceptance criteria:**
-- [ ] Default **`IT`** match is case-insensitive.
-- [ ] Configurable target string supported via parameter for tests and operators.
+- [x] Default **`IT`** match is case-insensitive. — `Test-ProvisioningDepartmentMatch` with `OrdinalIgnoreCase`; `Task6.DepartmentMatch.Tests.ps1`.
+- [x] Configurable target string supported via parameter for tests and operators. — `-Target` parameter with default `'IT'`; custom target tests.
 
 **Verification:**
-- [ ] Tests pass: Pester for rule edge cases (`it`, `IT ` trimmed?, etc. — align with **CONTEXT**: **Department** trimmed on user attribute; clarify trim on rule input in tests).
+- [x] Tests pass: Pester for rule edge cases (`it`, `IT ` trimmed?, etc. — align with **CONTEXT**: **Department** trimmed on user attribute; clarify trim on rule input in tests). — `tests/Task6*.Tests.ps1` (**12** department match + closure tests).
 
 **Dependencies:** Task 3
 
