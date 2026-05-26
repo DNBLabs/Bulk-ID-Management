@@ -1,11 +1,11 @@
 <#
 .SYNOPSIS
-    Pester tests for Task 7 Graph gateway contract (stub shape).
+    Pester tests for Task 7 Graph gateway contract shape.
 
 .DESCRIPTION
     Validates New-FakeProvisioningGraphGateway returns a hashtable with the documented
-    six ScriptBlock entries per CONTEXT Graph gateway contract. Stubs throw 'not implemented'
-    until Task 8 fills in fake logic.
+    six ScriptBlock entries per CONTEXT Graph gateway contract. Behavior tests verify
+    each operation responds correctly with default empty state.
 #>
 
 BeforeAll {
@@ -47,45 +47,51 @@ Describe 'Task 7 - Graph gateway contract via New-FakeProvisioningGraphGateway' 
         }
     }
 
-    It 'TestUpnExists stub throws NotImplementedException' {
+    It 'TestUpnExists returns $null for unknown UPN on empty state' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.TestUpnExists 'ada@contoso.com' } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            $result = & $gw.TestUpnExists 'ada@contoso.com'
+            $result | Should -BeNullOrEmpty
         }
     }
 
-    It 'NewUser stub throws NotImplementedException' {
+    It 'NewUser succeeds and returns an Object ID on empty state' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.NewUser @{ UserPrincipalName = 'ada@contoso.com' } } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            $oid = & $gw.NewUser @{ userPrincipalName = 'ada@contoso.com' }
+            $oid | Should -Not -BeNullOrEmpty
         }
     }
 
-    It 'UpdateUser stub throws NotImplementedException' {
+    It 'UpdateUser throws InvalidOperationException for unknown user' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.UpdateUser 'object-id' @{ department = 'IT' } } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            { & $gw.UpdateUser 'object-id' @{ department = 'IT' } } |
+                Should -Throw -ExceptionType ([System.InvalidOperationException])
         }
     }
 
-    It 'GetGroupById stub throws NotImplementedException' {
+    It 'GetGroupById throws InvalidOperationException for unknown group' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.GetGroupById 'group-id' } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            { & $gw.GetGroupById 'group-id' } |
+                Should -Throw -ExceptionType ([System.InvalidOperationException])
         }
     }
 
-    It 'TestGroupMembership stub throws NotImplementedException' {
+    It 'TestGroupMembership returns $false on empty state' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.TestGroupMembership 'user-id' 'group-id' } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            $result = & $gw.TestGroupMembership 'user-id' 'group-id'
+            $result | Should -BeFalse
         }
     }
 
-    It 'AddGroupMember stub throws NotImplementedException' {
+    It 'AddGroupMember throws InvalidOperationException for unknown group' {
         InModuleScope BulkIdentityManagement {
             $gw = New-FakeProvisioningGraphGateway
-            { & $gw.AddGroupMember 'user-id' 'group-id' } | Should -Throw -ExceptionType ([System.NotImplementedException])
+            { & $gw.AddGroupMember 'user-id' 'group-id' } |
+                Should -Throw -ExceptionType ([System.InvalidOperationException])
         }
     }
 }

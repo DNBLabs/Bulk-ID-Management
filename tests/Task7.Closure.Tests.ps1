@@ -51,8 +51,4 @@ Describe 'Task 7 closure - Graph gateway contract' {
         $taskPlan | Should -Match '(?m)^- \[x\] \*\*C .+ Closure\*\*'
     }
 
-    It 'does not introduce Task 8 test files' {
-        Get-ChildItem -LiteralPath $PSScriptRoot -Filter 'Task8*.Tests.ps1' -File -ErrorAction SilentlyContinue |
-            Should -BeNullOrEmpty
-    }
 }

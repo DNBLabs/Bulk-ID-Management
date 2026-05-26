@@ -225,11 +225,11 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Implement the Task 7 contract with in-memory dictionaries so Pester can simulate existing users, groups, and members without network.
 
 **Acceptance criteria:**
-- [ ] Fake supports paths needed for dry-run and apply unit tests (create, skip, update, group add idempotent).
-- [ ] No network calls.
+- [x] Fake supports paths needed for dry-run and apply unit tests (create, skip, update, group add idempotent). — `New-FakeProvisioningGraphGateway -State` with in-memory Users/UpnIndex/Groups/Members; all six ops implemented.
+- [x] No network calls. — Pure in-memory dictionaries and HashSets; zero imports of Microsoft.Graph.
 
 **Verification:**
-- [ ] Tests pass: Pester tests targeting fake only.
+- [x] Tests pass: Pester tests targeting fake only. — `tests/Task8*.Tests.ps1` (**23** tests: 18 behavior + 5 closure).
 
 **Dependencies:** Task 7
 

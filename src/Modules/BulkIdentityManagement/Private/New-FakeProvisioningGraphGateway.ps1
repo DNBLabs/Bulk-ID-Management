@@ -1,24 +1,31 @@
 <#
 .SYNOPSIS
-    Constructs a Graph gateway hashtable stub for testing and contract documentation.
+    Constructs a fake Graph gateway backed by in-memory state dictionaries.
 
 .DESCRIPTION
-    Returns a hashtable with six ScriptBlock entries representing the minimal Graph
-    operations the orchestrator requires. Each entry throws 'not implemented' until
-    Task 8 replaces placeholders with in-memory fake logic. Task 10 provides a
-    separate New-ProvisioningGraphGateway builder backed by real Microsoft.Graph calls.
+    Returns a hashtable with six ScriptBlock entries implementing the Graph
+    gateway contract using caller-supplied state. Each ScriptBlock closes over
+    the $State reference so tests can pre-seed data and inspect mutations.
 
     Gateway contract (v1):
       TestUpnExists       - UPN string -> user Object ID string if found, $null if not
-      NewUser             - hashtable of user fields (no password) -> created Object ID;
-                            gateway generates random password + forceChangePasswordNextSignIn
+      NewUser             - hashtable of user fields (no password) -> created Object ID
       UpdateUser          - Object ID + hashtable of patchable fields -> void
       GetGroupById        - group Object ID string -> group info or throw
       TestGroupMembership - user Object ID + group Object ID -> bool
       AddGroupMember      - user Object ID + group Object ID -> void (idempotent)
 
-    Errors: operations throw on failure; orchestrator catches per row.
-    No Microsoft.Graph calls in this file. See CONTEXT.md Graph gateway contract.
+    State shape (four sub-dictionaries):
+      Users    - keyed by Object ID -> user property hashtable with 'id'
+      UpnIndex - keyed by lowercase UPN -> Object ID (lookup index)
+      Groups   - keyed by group Object ID -> group info hashtable
+      Members  - keyed by group Object ID -> HashSet[string] of user Object IDs
+
+    No Microsoft.Graph calls. No password material stored. See CONTEXT.md.
+
+.PARAMETER State
+    Hashtable with Users, UpnIndex, Groups, Members sub-dictionaries.
+    When omitted, empty defaults are created internally.
 
 .OUTPUTS
     System.Collections.Hashtable
@@ -29,17 +36,93 @@
 
 function New-FakeProvisioningGraphGateway {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '',
-        Justification = 'Creates an in-memory hashtable stub; no system state changes.')]
+        Justification = 'Constructs an in-memory test double; no external state changes.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
-    param()
+    param(
+        [Parameter()]
+        [hashtable] $State
+    )
+
+    if (-not $State) {
+        $State = @{
+            Users    = @{}
+            UpnIndex = @{}
+            Groups   = @{}
+            Members  = @{}
+        }
+    }
 
     return @{
-        TestUpnExists       = { throw [System.NotImplementedException]::new('TestUpnExists is not implemented.') }
-        NewUser             = { throw [System.NotImplementedException]::new('NewUser is not implemented.') }
-        UpdateUser          = { throw [System.NotImplementedException]::new('UpdateUser is not implemented.') }
-        GetGroupById        = { throw [System.NotImplementedException]::new('GetGroupById is not implemented.') }
-        TestGroupMembership = { throw [System.NotImplementedException]::new('TestGroupMembership is not implemented.') }
-        AddGroupMember      = { throw [System.NotImplementedException]::new('AddGroupMember is not implemented.') }
+        TestUpnExists = {
+            param([string] $Upn)
+            $key = $Upn.ToLowerInvariant()
+            if ($State.UpnIndex.ContainsKey($key)) {
+                return $State.UpnIndex[$key]
+            }
+            return $null
+        }.GetNewClosure()
+
+        NewUser = {
+            param([hashtable] $Properties)
+            $upnKey = $Properties['userPrincipalName']
+            if (-not $upnKey) { $upnKey = $Properties['UserPrincipalName'] }
+            if ($upnKey) {
+                $lowered = $upnKey.ToLowerInvariant()
+                if ($State.UpnIndex.ContainsKey($lowered)) {
+                    throw [System.InvalidOperationException]::new(
+                        "User with UPN '$upnKey' already exists.")
+                }
+            }
+            $objectId = [guid]::NewGuid().ToString()
+            $record = $Properties.Clone()
+            $record['id'] = $objectId
+            $State.Users[$objectId] = $record
+            if ($upnKey) {
+                $State.UpnIndex[$upnKey.ToLowerInvariant()] = $objectId
+            }
+            return $objectId
+        }.GetNewClosure()
+
+        UpdateUser = {
+            param([string] $UserId, [hashtable] $Properties)
+            if (-not $State.Users.ContainsKey($UserId)) {
+                throw [System.InvalidOperationException]::new(
+                    "User with Object ID '$UserId' not found.")
+            }
+            $existing = $State.Users[$UserId]
+            foreach ($patchKey in $Properties.Keys) {
+                $existing[$patchKey] = $Properties[$patchKey]
+            }
+        }.GetNewClosure()
+
+        GetGroupById = {
+            param([string] $GroupId)
+            if (-not $State.Groups.ContainsKey($GroupId)) {
+                throw [System.InvalidOperationException]::new(
+                    "Group with Object ID '$GroupId' not found.")
+            }
+            return $State.Groups[$GroupId]
+        }.GetNewClosure()
+
+        TestGroupMembership = {
+            param([string] $UserId, [string] $GroupId)
+            if (-not $State.Members.ContainsKey($GroupId)) {
+                $State.Members[$GroupId] = [System.Collections.Generic.HashSet[string]]::new()
+            }
+            return $State.Members[$GroupId].Contains($UserId)
+        }.GetNewClosure()
+
+        AddGroupMember = {
+            param([string] $UserId, [string] $GroupId)
+            if (-not $State.Groups.ContainsKey($GroupId)) {
+                throw [System.InvalidOperationException]::new(
+                    "Group with Object ID '$GroupId' not found.")
+            }
+            if (-not $State.Members.ContainsKey($GroupId)) {
+                $State.Members[$GroupId] = [System.Collections.Generic.HashSet[string]]::new()
+            }
+            [void] $State.Members[$GroupId].Add($UserId)
+        }.GetNewClosure()
     }
 }
