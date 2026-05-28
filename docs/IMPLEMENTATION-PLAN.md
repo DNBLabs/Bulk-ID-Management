@@ -250,7 +250,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 - [x] Clear errors when cert or tenant/client parameters invalid. — GUID validation, thumbprint format, file existence/extension, private key check; all throw `InvalidOperationException`.
 
 **Verification:**
-- [x] Manual: Connect to a dev tenant with lab app registration (not in CI). — Deferred to lab; Pester covers parameter forwarding via mock.
+- [x] Manual: Connect to a dev tenant with lab app registration (not in CI). — Lab verified 2026-05-28: `Connect-ProvisioningGraph` (thumbprint) to **Bulk ID Manager** app; `Get-MgContext` returned **AppOnly**. Graph API smoke (`Get-MgOrganization`) returned 403 until application permissions are granted (expected pre–Task 10).
 - [x] CI: This task’s code is covered by **PSScriptAnalyzer** only unless mocked—no Graph in CI. — `tests/Task9*.Tests.ps1` (**25** tests: 11 behavior + 9 security + 5 closure); all mock `Connect-MgGraph`.
 
 **Dependencies:** Task 1
