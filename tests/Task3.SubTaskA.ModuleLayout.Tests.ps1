@@ -14,7 +14,7 @@ BeforeAll {
     $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
     $script:PublicDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Public'
     $script:PrivateDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Private'
-    $script:ConstantsPath = Join-Path -Path $script:PrivateDir -ChildPath 'ProvisioningCsv.Constants.ps1'
+    $script:ConstantsPath = Join-Path -Path $script:PrivateDir -ChildPath 'Csv/ProvisioningCsv.Constants.ps1'
     $script:ExpectedRequiredHeaders = @('FirstName', 'LastName', 'Department')
     $script:ExpectedOptionalHeaders = @(
         'MailNickname'
@@ -32,14 +32,14 @@ Describe 'Task 3 Sub-task A - BulkIdentityManagement CSV module layout' {
         Test-Path -LiteralPath $PrivateDir -PathType Container | Should -BeTrue
     }
 
-    It 'stores canonical CSV header names in Private/ProvisioningCsv.Constants.ps1' {
+    It 'stores canonical CSV header names in Private/Csv/ProvisioningCsv.Constants.ps1' {
         Test-Path -LiteralPath $ConstantsPath -PathType Leaf | Should -BeTrue
     }
 
     It 'dot-sources Private scripts before Public scripts in the root module' {
         $text = Get-Content -LiteralPath $Psm1Path -Raw
-        $privateIndex = $text.IndexOf("-FolderName Private", [System.StringComparison]::Ordinal)
-        $publicIndex = $text.IndexOf("-FolderName Public", [System.StringComparison]::Ordinal)
+        $privateIndex = $text.IndexOf("-FolderName 'Private'", [System.StringComparison]::Ordinal)
+        $publicIndex = $text.IndexOf("-FolderName 'Public'", [System.StringComparison]::Ordinal)
         $privateIndex | Should -BeGreaterThan -1
         $publicIndex | Should -BeGreaterThan -1
         $privateIndex | Should -BeLessThan $publicIndex
@@ -63,7 +63,7 @@ Describe 'Task 3 Sub-task A - BulkIdentityManagement CSV module layout' {
         $graphAuthFiles = @('Connect-ProvisioningGraph.ps1')
         $paths = @($Psm1Path)
         if (Test-Path -LiteralPath $PrivateDir) {
-            $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File |
+            $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File -Recurse |
                 Where-Object { $_.Name -notin $graphAuthFiles } |
                 ForEach-Object { $_.FullName })
         }

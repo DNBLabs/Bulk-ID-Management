@@ -11,8 +11,8 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $repoRoot = $script:RepoRoot
     $privateDir = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private'
-    $constantsPath = Join-Path -Path $privateDir -ChildPath 'ProvisioningCsv.Constants.ps1'
-    $headerPath = Join-Path -Path $privateDir -ChildPath 'Test-ProvisioningCsvHeader.ps1'
+    $constantsPath = Join-Path -Path $privateDir -ChildPath 'Csv/ProvisioningCsv.Constants.ps1'
+    $headerPath = Join-Path -Path $privateDir -ChildPath 'Csv/Test-ProvisioningCsvHeader.ps1'
     if (-not (Test-Path -LiteralPath $constantsPath -PathType Leaf)) {
         throw "Expected constants script at: $constantsPath"
     }
@@ -112,7 +112,7 @@ Describe 'Task 3 Sub-task D - Get-ProvisioningCsvHeaderColumnMap' {
     }
 
     It 'builds the column map from the first logical record produced by the CSV parser' {
-        $parserPath = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Get-ProvisioningCsvRecord.ps1'
+        $parserPath = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Csv/Get-ProvisioningCsvRecord.ps1'
         . $parserPath
 
         $records = Get-ProvisioningCsvLogicalRecords -PhysicalLines @(

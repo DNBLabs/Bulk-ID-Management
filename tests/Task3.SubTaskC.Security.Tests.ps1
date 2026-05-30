@@ -10,7 +10,7 @@
 BeforeAll {
     $repoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:ModuleRoot = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
-    $script:ParserPath = Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-ProvisioningCsvRecord.ps1'
+    $script:ParserPath = Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Csv/Get-ProvisioningCsvRecord.ps1'
     if (-not (Test-Path -LiteralPath $script:ParserPath -PathType Leaf)) {
         throw "Expected CSV logical record parser at: $script:ParserPath"
     }

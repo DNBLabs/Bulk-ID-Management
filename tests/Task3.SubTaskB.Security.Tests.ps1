@@ -9,7 +9,7 @@
 BeforeAll {
     $repoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:PrivateDir = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private'
-    $utf8ReaderPath = Join-Path -Path $script:PrivateDir -ChildPath 'Read-ProvisioningCsvUtf8.ps1'
+    $utf8ReaderPath = Join-Path -Path $script:PrivateDir -ChildPath 'Csv/Read-ProvisioningCsvUtf8.ps1'
     . $utf8ReaderPath
 }
 

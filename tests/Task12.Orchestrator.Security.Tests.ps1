@@ -6,7 +6,7 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:Psm1Path = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psm1'
-    $script:SrcFile = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningOrchestrator.ps1'
+    $script:SrcFile = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Orchestration/Invoke-ProvisioningOrchestrator.ps1'
     Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 }
 

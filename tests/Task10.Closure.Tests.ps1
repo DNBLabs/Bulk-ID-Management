@@ -56,8 +56,8 @@ Describe 'Task 10 closure - real Graph gateway' {
 
     It 'PSScriptAnalyzer clean on Task 10 gateway and retry source' {
         $paths = @(
-            (Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/New-ProvisioningGraphGateway.ps1')
-            (Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningGraphCommand.ps1')
+            (Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Graph/New-ProvisioningGraphGateway.ps1')
+            (Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Graph/Invoke-ProvisioningGraphCommand.ps1')
         )
         foreach ($path in $paths) {
             $violations = Invoke-ScriptAnalyzer -Path $path -Severity Warning, Error

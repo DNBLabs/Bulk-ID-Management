@@ -10,17 +10,12 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
-    $privateDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Private'
-    $importPath = Join-Path -Path $script:ModuleRoot -ChildPath 'Public/Import-ProvisioningCsv.ps1'
-    if (-not (Test-Path -LiteralPath $importPath -PathType Leaf)) {
-        throw "Expected Import-ProvisioningCsv script at: $importPath"
+    $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
+    if (-not (Test-Path -LiteralPath $script:Psm1Path -PathType Leaf)) {
+        throw "Expected module root script at: $script:Psm1Path"
     }
 
-    Get-ChildItem -LiteralPath $privateDir -Filter '*.ps1' -File |
-        Sort-Object -Property Name |
-        ForEach-Object { . $_.FullName }
-
-    . $importPath
+    Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 }
 
 Describe 'Task 3 Sub-task F - Import-ProvisioningCsv' {

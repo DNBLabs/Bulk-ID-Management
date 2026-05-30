@@ -19,7 +19,7 @@ Describe 'Task 3 Sub-task A - security regressions' {
 
     It 'resolves and confines dot-sourced scripts under the module root directory before loading' {
         $text = Get-Content -LiteralPath $Psm1Path -Raw
-        $text | Should -Match 'Resolve-Path\s+-LiteralPath\s+\$_.FullName'
+        $text | Should -Match 'Resolve-Path\s+-LiteralPath\s+\$scriptPath'
         $text | Should -Match '\$moduleRootPrefix\s*=\s*\$moduleRootResolved\s*\+\s*\[System\.IO\.Path\]::DirectorySeparatorChar'
         $text | Should -Match 'StartsWith\s*\(\s*\$moduleRootPrefix'
     }
@@ -52,7 +52,7 @@ Describe 'Task 3 Sub-task A - security regressions' {
 
     It 'does not use high-risk network or process cmdlets in module layout scripts' {
         $paths = @($Psm1Path)
-        $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
+        $paths += @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File -Recurse -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
         $paths += @(Get-ChildItem -LiteralPath $PublicDir -Filter '*.ps1' -File -ErrorAction SilentlyContinue | ForEach-Object { $_.FullName })
         $dangerousPatterns = @(
             '(?i)\bInvoke-WebRequest\b'

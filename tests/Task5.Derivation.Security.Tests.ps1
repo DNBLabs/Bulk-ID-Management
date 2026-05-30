@@ -68,11 +68,11 @@ Describe 'Task 5 - Get-DerivedUserPrincipalName security' {
     It 'does not use high-risk execution, network, or Graph cmdlets in derivation scripts' {
         $paths = @(
             $script:DerivePath
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-NormalizedProvisioningTenantDomain.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-CanonicalProvisioningUpnCandidate.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-ProvisioningCsvUpnParts.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-ProvisioningUpnBaseLocalPart.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Test-MappedProvisioningIdentityBoundary.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-NormalizedProvisioningTenantDomain.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-CanonicalProvisioningUpnCandidate.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-ProvisioningCsvUpnParts.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-ProvisioningUpnBaseLocalPart.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Test-MappedProvisioningIdentityBoundary.ps1')
         )
 
         $dangerousPatterns = @(

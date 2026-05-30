@@ -11,8 +11,8 @@ BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
     $privateDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Private'
-    $constantsPath = Join-Path -Path $privateDir -ChildPath 'ProvisioningCsv.Constants.ps1'
-    $script:MaterializerPath = Join-Path -Path $privateDir -ChildPath 'New-ProvisioningCsvRow.ps1'
+    $constantsPath = Join-Path -Path $privateDir -ChildPath 'Csv/ProvisioningCsv.Constants.ps1'
+    $script:MaterializerPath = Join-Path -Path $privateDir -ChildPath 'Csv/New-ProvisioningCsvRow.ps1'
     . $constantsPath
     . $script:MaterializerPath
 

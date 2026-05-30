@@ -16,12 +16,8 @@ BeforeAll {
     $script:MaxDisplayNameLength = 256
     $script:MaxNicknameInputLength = 512
 
-    $privateDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Private'
-    Get-ChildItem -LiteralPath $privateDir -Filter '*.ps1' -File |
-        Sort-Object -Property Name |
-        ForEach-Object { . $_.FullName }
-
-    . $script:MapPath
+    $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
+    Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 
     function script:New-TestProvisioningRow {
         param(
@@ -67,11 +63,11 @@ Describe 'Task 4 - Get-MappedProvisioningIdentity security' {
     It 'does not use high-risk execution, network, or Graph cmdlets in mapping scripts' {
         $paths = @(
             $script:MapPath
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Format-ProvisioningIdentityNamePart.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-ProvisioningNameMappingFromRow.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-NormalizedProvisioningMailNickname.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/ProvisioningIdentity.Constants.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Test-ProvisioningIdentityRowBoundary.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Format-ProvisioningIdentityNamePart.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-ProvisioningNameMappingFromRow.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-NormalizedProvisioningMailNickname.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/ProvisioningIdentity.Constants.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Test-ProvisioningIdentityRowBoundary.ps1')
         )
 
         $dangerousPatterns = @(

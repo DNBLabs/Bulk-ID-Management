@@ -3,9 +3,9 @@
     PowerShell module root for Bulk Identity Management (Entra ID bulk provisioning).
 
 .DESCRIPTION
-    This module will host CSV contract validation, identity derivation, IT department rules,
-    a Microsoft Graph gateway, and apply orchestration. Task 1 establishes a loadable module
-    layout; exact gallery pins live in BulkIdentityManagement.psd1 RequiredModules.
+    This module hosts CSV contract validation, identity derivation, IT department rules,
+    a Microsoft Graph gateway, and apply orchestration. Exact gallery pins live in
+    BulkIdentityManagement.psd1 RequiredModules.
 
     Normative contract: CONTEXT.md at repository root.
 
@@ -14,8 +14,9 @@
     Microsoft Graph; the dependency exists for local and guarded apply paths.
 
     Security: At import time this file only dot-sources fixed *.ps1 children under Public/ and Private/
-    beneath the module root (paths resolved and confined). No operator CSV paths, no expression-from-string,
-    and no interactive network calls here; keep untrusted input handling in dedicated functions per CONTEXT.
+    beneath the module root (paths resolved and confined). Private scripts load in explicit phases
+    (Shared, Csv, Identity, Graph, Reporting, Orchestration) so constants and retry policy initialize
+    before consumers.
 #>
 
 $moduleRoot = $PSScriptRoot
@@ -24,35 +25,73 @@ $moduleRootResolved = (Resolve-Path -LiteralPath $moduleRoot).ProviderPath.TrimE
     [System.IO.Path]::AltDirectorySeparatorChar)
 $moduleRootPrefix = $moduleRootResolved + [System.IO.Path]::DirectorySeparatorChar
 
-# Dot-sourced at module scope so child scripts define module-scoped variables (not function-local).
-$dotSourceModuleChildScripts = {
+$dotSourceModuleScripts = {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string[]] $ScriptPaths
+    )
+
+    foreach ($scriptPath in $ScriptPaths) {
+        $resolvedScript = (Resolve-Path -LiteralPath $scriptPath -ErrorAction Stop).ProviderPath
+        if (-not $resolvedScript.StartsWith($moduleRootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $message = "Refusing to dot-source module script outside module root: $resolvedScript"
+            throw [System.InvalidOperationException]::new($message)
+        }
+
+        . $resolvedScript
+    }
+}
+
+$dotSourceModuleFolder = {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
         [ValidateSet('Private', 'Public')]
-        [string] $FolderName
+        [string] $FolderName,
+
+        [Parameter()]
+        [string] $SubfolderName
     )
 
-    $scriptDirectory = Join-Path -Path $moduleRoot -ChildPath $FolderName
-    if (-not (Test-Path -LiteralPath $scriptDirectory -PathType Container)) {
-        return
+    $scriptDirectory = if ([string]::IsNullOrWhiteSpace($SubfolderName)) {
+        Join-Path -Path $moduleRoot -ChildPath $FolderName
+    }
+    else {
+        Join-Path -Path $moduleRoot -ChildPath $FolderName | Join-Path -ChildPath $SubfolderName
     }
 
-    Get-ChildItem -LiteralPath $scriptDirectory -Filter '*.ps1' -File |
-        Sort-Object -Property Name |
-        ForEach-Object {
-            $resolvedScript = (Resolve-Path -LiteralPath $_.FullName).ProviderPath
-            if (-not $resolvedScript.StartsWith($moduleRootPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
-                $message = "Refusing to dot-source module script outside module root: $resolvedScript"
-                throw [System.InvalidOperationException]::new($message)
-            }
+    if (-not (Test-Path -LiteralPath $scriptDirectory -PathType Container)) {
+        return @()
+    }
 
-            . $resolvedScript
-        }
+    $scriptPaths = @(Get-ChildItem -LiteralPath $scriptDirectory -Filter '*.ps1' -File |
+        Sort-Object -Property Name |
+        ForEach-Object { $_.FullName })
+
+    if ($scriptPaths.Count -gt 0) {
+        . $dotSourceModuleScripts -ScriptPaths $scriptPaths
+    }
+
+    return $scriptPaths
 }
 
-. $dotSourceModuleChildScripts -FolderName Private
-. $dotSourceModuleChildScripts -FolderName Public
+$privatePhases = @(
+    @{ Name = 'Csv'; Subfolder = 'Csv' }
+    @{ Name = 'Identity'; Subfolder = 'Identity' }
+    @{ Name = 'Reporting'; Subfolder = 'Reporting' }
+    @{ Name = 'Graph'; Subfolder = 'Graph' }
+    @{ Name = 'Orchestration'; Subfolder = 'Orchestration' }
+)
+
+# Shared helpers load first (cross-cutting, no subfolder).
+. $dotSourceModuleFolder -FolderName 'Private' -SubfolderName 'Shared'
+
+foreach ($phase in $privatePhases) {
+    . $dotSourceModuleFolder -FolderName 'Private' -SubfolderName $phase.Subfolder
+}
+
+. $dotSourceModuleFolder -FolderName 'Public'
 
 Export-ModuleMember -Function @(
     'Import-ProvisioningCsv'

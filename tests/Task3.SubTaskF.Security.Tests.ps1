@@ -10,14 +10,9 @@
 BeforeAll {
     $script:RepoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:ModuleRoot = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement'
-    $privateDir = Join-Path -Path $script:ModuleRoot -ChildPath 'Private'
     $script:ImportPath = Join-Path -Path $script:ModuleRoot -ChildPath 'Public/Import-ProvisioningCsv.ps1'
-
-    Get-ChildItem -LiteralPath $privateDir -Filter '*.ps1' -File |
-        Sort-Object -Property Name |
-        ForEach-Object { . $_.FullName }
-
-    . $script:ImportPath
+    $script:Psm1Path = Join-Path -Path $script:ModuleRoot -ChildPath 'BulkIdentityManagement.psm1'
+    Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 }
 
 Describe 'Task 3 Sub-task F - Import-ProvisioningCsv security' {

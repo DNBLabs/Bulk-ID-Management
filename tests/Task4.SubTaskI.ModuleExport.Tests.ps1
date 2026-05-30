@@ -60,11 +60,11 @@ Describe 'Task 4 Sub-task I - module export and integration' {
     It 'does not reference Microsoft Graph in Task 4 source scripts' {
         $paths = @(
             (Join-Path -Path $script:ModuleRoot -ChildPath 'Public/Get-MappedProvisioningIdentity.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Format-ProvisioningIdentityNamePart.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-ProvisioningNameMappingFromRow.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Get-NormalizedProvisioningMailNickname.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/ProvisioningIdentity.Constants.ps1')
-            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Test-ProvisioningIdentityRowBoundary.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Format-ProvisioningIdentityNamePart.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-ProvisioningNameMappingFromRow.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Get-NormalizedProvisioningMailNickname.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/ProvisioningIdentity.Constants.ps1')
+            (Join-Path -Path $script:ModuleRoot -ChildPath 'Private/Identity/Test-ProvisioningIdentityRowBoundary.ps1')
         )
 
         foreach ($path in $paths) {

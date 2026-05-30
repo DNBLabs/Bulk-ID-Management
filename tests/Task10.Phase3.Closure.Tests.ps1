@@ -12,7 +12,7 @@ BeforeAll {
     $script:Psm1Path = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/BulkIdentityManagement.psm1'
     $script:ImplementationPlanPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs/IMPLEMENTATION-PLAN.md'
     $script:TaskPlanPath = Join-Path -Path $script:RepoRoot -ChildPath 'docs/tasks/task-10/PLAN-Task-10-Real-Graph-Gateway.md'
-    $script:GatewaySourcePath = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/New-ProvisioningGraphGateway.ps1'
+    $script:GatewaySourcePath = Join-Path -Path $script:RepoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private/Graph/New-ProvisioningGraphGateway.ps1'
     Import-Module -Name $script:Psm1Path -Force -ErrorAction Stop
 
     function script:Get-Task10PlanPhaseSection {

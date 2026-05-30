@@ -10,7 +10,7 @@
 BeforeAll {
     $repoRoot = (Resolve-Path -Path (Join-Path -Path $PSScriptRoot -ChildPath '..') -ErrorAction Stop).Path
     $script:PrivateDir = Join-Path -Path $repoRoot -ChildPath 'src/Modules/BulkIdentityManagement/Private'
-    $utf8ReaderPath = Join-Path -Path $script:PrivateDir -ChildPath 'Read-ProvisioningCsvUtf8.ps1'
+    $utf8ReaderPath = Join-Path -Path $script:PrivateDir -ChildPath 'Csv/Read-ProvisioningCsvUtf8.ps1'
     if (-not (Test-Path -LiteralPath $utf8ReaderPath -PathType Leaf)) {
         throw "Expected UTF-8 reader script at: $utf8ReaderPath"
     }
