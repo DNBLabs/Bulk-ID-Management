@@ -29,6 +29,10 @@ Implementation is in progress; see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTA
 
 The Task 1 foundation is present: the `BulkIdentityManagement` module scaffold lives under `src/Modules/BulkIdentityManagement/`, targets PowerShell 7.2+ with 7.4+ preferred, and pins `Microsoft.Graph` through the repository module manifest rather than a floating dependency policy.
 
+## Apply output hygiene
+
+Default console output from batch reporting omits passwords and avoids full **UPN** / object IDs. For lab debugging only, a future entry script will support **`-ShowIdentifiers`** (off by default) to print fuller identifiers; do not enable in production transcripts.
+
 ## Not Yet Implemented Boundary
 
-The README does not yet document working provisioning commands. CSV parsing, identity derivation, Graph gateway work, authentication, apply orchestration, sample CSV content, the operator runbook, and the lab checklist remain assigned to later tasks in the implementation plan.
+CSV import, identity mapping, UPN derivation, certificate Graph auth, fake/real gateway slices, row outcomes, and fake-gateway orchestration are implemented in the module (see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)). The public operator entry script, full real-gateway apply, sample CSV, runbook, and lab checklist remain later tasks.

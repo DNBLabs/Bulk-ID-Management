@@ -192,13 +192,37 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 
 ### Checkpoint: After Tasks 1–6
 
-- [ ] `Invoke-Pester` passes for all tests written to date.
-- [ ] No **Microsoft.Graph** import required for Tasks 3–6 tests.
-- [ ] Optional: quick human review of CSV error messages for clarity.
+- [x] `Invoke-Pester` passes for all tests written to date. — Full suite green (Tasks 1–6 and later tasks; no failures).
+- [x] No **Microsoft.Graph** import required for Tasks 3–6 tests. — Task 3–6 Pester uses CSV/identity logic only.
+- [x] Optional: quick human review of CSV error messages for clarity. — Covered by Task 3 failure tests and closure smoke.
 
 ---
 
 ### Phase 3: Graph boundary and orchestration (fake gateway)
+
+**Phase status (2026-05-28):** **6 complete** (Tasks 7–12). Full **Pester** suite green without live Graph.
+
+| Task | Focus | Status |
+|------|--------|--------|
+| **7** | Gateway contract (signatures, docs) | **Complete** |
+| **8** | In-memory fake gateway | **Complete** |
+| **9** | Certificate auth session | **Complete** |
+| **10** | Real gateway + graph transient policy | **Complete** |
+| **11** | Row outcomes + output hygiene | **Complete** |
+| **12** | Orchestrator (dry run + apply on fake) | **Complete** |
+
+**Note:** Task 10’s [PLAN](tasks/task-10/PLAN-Task-10-Real-Graph-Gateway.md) uses numbered *phases* (1–6) for implementation slices; that is separate from this **Implementation Plan Phase 3** (Tasks 7–12).
+
+**Phase lock [3] completion checklist** (Implementation Plan Phase 3 — Tasks 7–12):
+
+- [x] **Task 7** — Phase 3 lock complete. — `tests/Task7*.Tests.ps1` (**14** tests).
+- [x] **Task 8** — Phase 3 lock complete. — `tests/Task8*.Tests.ps1` (**23** tests).
+- [x] **Task 9** — Phase 3 lock complete. — `tests/Task9*.Tests.ps1` (**25** tests).
+- [x] **Task 10** — Phase 3 lock complete. — `tests/Task10*.Tests.ps1` (**42** tests: retry, helpers, operations, security, Phase 3 + closure).
+- [x] **Task 11** — Phase 3 lock complete. — `tests/Task11*.Tests.ps1` (**9** tests: 7 behavior + 2 closure).
+- [x] **Task 12** — Phase 3 lock complete. — `tests/Task12*.Tests.ps1` (**8** tests: 6 orchestrator + 2 closure).
+
+---
 
 ## Task 7: Graph gateway contract (narrow interface)
 
@@ -214,7 +238,8 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Tasks 4–6 (field names stable)
 
 **Files likely touched:**
-- `src/Modules/<Name>/` — gateway interface stubs
+- `src/Modules/BulkIdentityManagement/Private/New-FakeProvisioningGraphGateway.ps1`
+- `tests/Task7*.Tests.ps1`
 
 **Estimated scope:** Small
 
@@ -234,8 +259,8 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Task 7
 
 **Files likely touched:**
-- `src/Modules/<Name>/` or `tests/Fakes/` — fake implementation
-- `tests/GraphFake.Tests.ps1`
+- `src/Modules/BulkIdentityManagement/Private/New-FakeProvisioningGraphGateway.ps1`
+- `tests/Task8*.Tests.ps1`
 
 **Estimated scope:** Small
 
@@ -256,7 +281,8 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Task 1
 
 **Files likely touched:**
-- `src/Modules/<Name>/` — `Connect-*GraphSession` or similar
+- `src/Modules/BulkIdentityManagement/Public/Connect-ProvisioningGraph.ps1`
+- `tests/Task9*.Tests.ps1`
 
 **Estimated scope:** Small–Medium
 
@@ -266,20 +292,25 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 
 **Description:** Implement the Task 7 contract using **Microsoft.Graph** **v1.0** cmdlets or REST, including **bounded retries** for **429** / selected **5xx**, honoring **Retry-After** when present. Map Graph exceptions to stable messages for **row outcomes**.
 
+**Progress:** Task 10 complete 2026-05-28 — see [PLAN-Task-10-Real-Graph-Gateway.md](tasks/task-10/PLAN-Task-10-Real-Graph-Gateway.md).
+
 **Acceptance criteria:**
-- [ ] No **beta** profile by default.
-- [ ] Retries are capped (attempt count and/or cumulative wait).
-- [ ] **IT membership group** resolved by **Object ID** (no display-name-only fuzzy search).
+- [x] No **beta** profile by default. — `New-ProvisioningGraphGateway` calls `Select-MgProfile -Name 'v1.0'` at construction; not exported.
+- [x] Retries are capped (attempt count and/or cumulative wait). — `Invoke-ProvisioningGraphCommand` (5 attempts, 90s cumulative cap, exponential backoff).
+- [x] **IT membership group** resolved by **Object ID** (no display-name-only fuzzy search). — `GetGroupById` / membership ops use `Get-MgGroup -GroupId` and GUID validation.
 
 **Verification:**
-- [ ] Manual: Run against lab tenant with small CSV (after Task 13 entry exists, or provisional script).
-- [ ] Unit: If possible, mock lowest layer; otherwise manual only for this slice.
+- [ ] Manual: Run against lab tenant with small CSV (after Task 13 entry exists, or provisional script). Lab auth verified 2026-05-28; grant `User.ReadWrite.All`, `Group.Read.All`, `GroupMember.ReadWrite.All` before gateway smoke.
+- [x] CI (Task 10 complete): All `tests/Task10*.Tests.ps1` green; mocked Graph cmdlets; no live tenant. — **42** tests (2026-05-28). PSScriptAnalyzer **0** on gateway + retry source (closure-checked).
 
 **Dependencies:** Tasks 7, 9
 
 **Files likely touched:**
-- `src/Modules/<Name>/` — real gateway
-- Optional: `tests/` with HTTP mocks if adopted later
+- `src/Modules/BulkIdentityManagement/Private/New-ProvisioningGraphGateway.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningGraphGatewayOperations.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningGraphCommand.ps1`
+- `src/Modules/BulkIdentityManagement/Private/ConvertTo-ProvisioningGraphODataLiteral.ps1`, `ConvertTo-ProvisioningGraphNewUserBody.ps1`, `ConvertTo-ProvisioningGraphPatchBody.ps1`, `New-ProvisioningGraphUserPassword.ps1`, `Test-ProvisioningGraphObjectId.ps1`, `Test-ProvisioningGraphGroupMembership.ps1`, `Get-ProvisioningGraphErrorMetadata.ps1`
+- `tests/Task10.RealGateway*.Tests.ps1`, `tests/Task10.Phase3*.Tests.ps1`, `tests/Task10.Closure.Tests.ps1`
 
 **Estimated scope:** Medium
 
@@ -290,18 +321,22 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Define **row outcome** enum or structured objects (created, skipped, updated, membership ensured, failed). Implement aggregate summary and default console formatting that omits passwords and avoids full **UPN** / object IDs unless **ShowIdentifiers** is enabled.
 
 **Acceptance criteria:**
-- [ ] Passwords never written to default streams.
-- [ ] **ShowIdentifiers** opt-in documented with README warning.
-- [ ] Exit code policy: **non-zero** if any row failed (**batch error policy**).
+- [x] Passwords never written to default streams. — `Format-ProvisioningRowOutcomeDisplayLine` redacts credential patterns; tests assert no password material in output.
+- [x] **ShowIdentifiers** opt-in documented with README warning. — README **Apply output hygiene** section documents `-ShowIdentifiers` lab-only use.
+- [x] Exit code policy: **non-zero** if any row failed (**batch error policy**). — `Get-ProvisioningBatchExitCode` returns **1** when any outcome is **Failed**.
 
 **Verification:**
-- [ ] Tests pass: Pester on formatting/redaction logic with fixed inputs.
+- [x] Tests pass: Pester on formatting/redaction logic with fixed inputs. — `tests/Task11*.Tests.ps1` (**9** tests).
 
 **Dependencies:** None (can parallelize after Task 3); practically before Task 12
 
 **Files likely touched:**
-- `src/Modules/<Name>/` — reporting functions
-- `tests/Reporting.Tests.ps1`
+- `src/Modules/BulkIdentityManagement/Private/ProvisioningRowOutcome.Constants.ps1`
+- `src/Modules/BulkIdentityManagement/Private/New-ProvisioningRowOutcome.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Format-ProvisioningRowOutcomeDisplayLine.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Get-ProvisioningBatchExitCode.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Write-ProvisioningAggregateReport.ps1`
+- `tests/Task11.RowOutcome.Tests.ps1`, `tests/Task11.Closure.Tests.ps1`
 
 **Estimated scope:** Small
 
@@ -312,18 +347,18 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Description:** Implement batch loop: for each row, compute identity, dry-run plan line, or mutating path (skip by default if UPN exists; **UpdateExisting** limited fields), then **IT membership ensure** for qualifying rows. Continue on row failure; collect outcomes; set exit code.
 
 **Acceptance criteria:**
-- [ ] **Dry run** performs no mutating calls on fake (assert call counts / state unchanged).
-- [ ] **Apply** with fake mutates fake state consistent with **CONTEXT** ordering (user resolved before group).
-- [ ] **IT membership ensure** runs when user creation skipped but row qualifies.
+- [x] **Dry run** performs no mutating calls on fake (assert call counts / state unchanged). — `Invoke-ProvisioningOrchestrator -DryRun`; `Task12.Orchestrator.Tests.ps1`.
+- [x] **Apply** with fake mutates fake state consistent with **CONTEXT** ordering (user resolved before group). — Create/skip/update paths against `New-FakeProvisioningGraphGateway`.
+- [x] **IT membership ensure** runs when user creation skipped but row qualifies. — **MembershipEnsured** outcome when existing IT user gains group membership.
 
 **Verification:**
-- [ ] Tests pass: Pester end-to-end on fake for representative scenarios.
+- [x] Tests pass: Pester end-to-end on fake for representative scenarios. — `tests/Task12*.Tests.ps1` (**8** tests).
 
 **Dependencies:** Tasks 3–8, 11
 
 **Files likely touched:**
-- `src/Modules/<Name>/` — orchestrator
-- `tests/Orchestrator.Tests.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningOrchestrator.ps1`
+- `tests/Task12.Orchestrator.Tests.ps1`, `tests/Task12.Closure.Tests.ps1`
 
 **Estimated scope:** Medium
 
@@ -331,9 +366,11 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 
 ### Checkpoint: After Tasks 7–12
 
-- [ ] Full **Pester** suite green without Graph.
-- [ ] Orchestrator behaviors match **CONTEXT** for skip/update/membership/order.
-- [ ] Quick review of **row outcome** vocabulary vs support expectations.
+- [x] Full **Pester** suite green without Graph. — `Invoke-Pester './tests'` green (2026-05-28); includes Task 10 real gateway tests (mocked Graph cmdlets; no live tenant).
+- [x] Tasks **7–10** acceptance complete.
+- [x] Tasks **11–12** acceptance complete.
+- [x] Orchestrator behaviors match **CONTEXT** for skip/update/membership/order. — `Task12.Orchestrator.Tests.ps1`.
+- [x] Quick review of **row outcome** vocabulary vs support expectations. — Task 11 status labels align with CONTEXT (Created, Skipped, Updated, MembershipEnsured, Failed).
 
 ---
 

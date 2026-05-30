@@ -41,8 +41,8 @@ Describe 'Task 9 Closure' {
         $violations | Should -BeNullOrEmpty
     }
 
-    It 'does not introduce Task 10 test files' {
-        $task10Tests = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task10*' -ErrorAction SilentlyContinue
-        $task10Tests | Should -BeNullOrEmpty -Because 'Task 10 is out of scope'
+    It 'does not introduce Task 13 test files' {
+        $task13Tests = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue
+        $task13Tests | Should -BeNullOrEmpty -Because 'Task 13 is out of scope for Task 9'
     }
 }
