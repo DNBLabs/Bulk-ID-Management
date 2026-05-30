@@ -238,7 +238,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Tasks 4–6 (field names stable)
 
 **Files likely touched:**
-- `src/Modules/BulkIdentityManagement/Private/New-FakeProvisioningGraphGateway.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/New-FakeProvisioningGraphGateway.ps1`
 - `tests/Task7*.Tests.ps1`
 
 **Estimated scope:** Small
@@ -259,7 +259,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Task 7
 
 **Files likely touched:**
-- `src/Modules/BulkIdentityManagement/Private/New-FakeProvisioningGraphGateway.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/New-FakeProvisioningGraphGateway.ps1`
 - `tests/Task8*.Tests.ps1`
 
 **Estimated scope:** Small
@@ -306,10 +306,10 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Tasks 7, 9
 
 **Files likely touched:**
-- `src/Modules/BulkIdentityManagement/Private/New-ProvisioningGraphGateway.ps1`
-- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningGraphGatewayOperations.ps1`
-- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningGraphCommand.ps1`
-- `src/Modules/BulkIdentityManagement/Private/ConvertTo-ProvisioningGraphODataLiteral.ps1`, `ConvertTo-ProvisioningGraphNewUserBody.ps1`, `ConvertTo-ProvisioningGraphPatchBody.ps1`, `New-ProvisioningGraphUserPassword.ps1`, `Test-ProvisioningGraphObjectId.ps1`, `Test-ProvisioningGraphGroupMembership.ps1`, `Get-ProvisioningGraphErrorMetadata.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/New-ProvisioningGraphGateway.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/Invoke-ProvisioningGraphGatewayOperations.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/Invoke-ProvisioningGraphCommand.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Graph/ConvertTo-ProvisioningGraphODataLiteral.ps1`, `ConvertTo-ProvisioningGraphNewUserBody.ps1`, `ConvertTo-ProvisioningGraphPatchBody.ps1`, `New-ProvisioningGraphUserPassword.ps1`, `Test-ProvisioningGraphObjectId.ps1`, `Test-ProvisioningGraphGroupMembership.ps1`, `Get-ProvisioningGraphErrorMetadata.ps1`
 - `tests/Task10.RealGateway*.Tests.ps1`, `tests/Task10.Phase3*.Tests.ps1`, `tests/Task10.Closure.Tests.ps1`
 
 **Estimated scope:** Medium
@@ -331,11 +331,11 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** None (can parallelize after Task 3); practically before Task 12
 
 **Files likely touched:**
-- `src/Modules/BulkIdentityManagement/Private/ProvisioningRowOutcome.Constants.ps1`
-- `src/Modules/BulkIdentityManagement/Private/New-ProvisioningRowOutcome.ps1`
-- `src/Modules/BulkIdentityManagement/Private/Format-ProvisioningRowOutcomeDisplayLine.ps1`
-- `src/Modules/BulkIdentityManagement/Private/Get-ProvisioningBatchExitCode.ps1`
-- `src/Modules/BulkIdentityManagement/Private/Write-ProvisioningAggregateReport.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Reporting/ProvisioningRowOutcome.Constants.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Reporting/New-ProvisioningRowOutcome.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Reporting/Format-ProvisioningRowOutcomeDisplayLine.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Reporting/Get-ProvisioningBatchExitCode.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Reporting/Write-ProvisioningAggregateReport.ps1`
 - `tests/Task11.RowOutcome.Tests.ps1`, `tests/Task11.Closure.Tests.ps1`
 
 **Estimated scope:** Small
@@ -357,7 +357,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 **Dependencies:** Tasks 3–8, 11
 
 **Files likely touched:**
-- `src/Modules/BulkIdentityManagement/Private/Invoke-ProvisioningOrchestrator.ps1`
+- `src/Modules/BulkIdentityManagement/Private/Orchestration/Invoke-ProvisioningOrchestrator.ps1`
 - `tests/Task12.Orchestrator.Tests.ps1`, `tests/Task12.Closure.Tests.ps1`
 
 **Estimated scope:** Medium
@@ -376,22 +376,37 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 
 ### Phase 4: Entry point and live gateway wiring
 
+**Phase status (2026-05-30):** **Task 13 complete** (operator entry + live gateway wiring). Pester covers wiring with mocked Graph; lab dry run/apply remains manual.
+
+| Task | Focus | Status |
+|------|--------|--------|
+| **13** | Operator entry script (parameters + wiring) | **Complete** |
+
+**Phase lock [4] completion checklist** (Implementation Plan Phase 4 — Task 13):
+
+- [x] **Task 13** — Phase 4 lock complete. — `tests/Task13*.Tests.ps1` (**13** tests: 5 entry wiring + 5 security + 3 closure).
+- [x] **Architecture hygiene** — No loose `Private/*.ps1` at module root; phased subfolders only (`Csv`, `Identity`, `Reporting`, `Graph`, `Orchestration`, `Shared`). Guard: `Task3.SubTaskA.ModuleLayout.Tests.ps1`.
+
 ## Task 13: Operator entry script (parameters + wiring)
 
 **Description:** Public entry (script or manifest-exported command) accepting CSV path, tenant/client identifiers, certificate parameters, **IT membership group** id, domain suffix, **WhatIf**/**DryRun**, **UpdateExisting**, optional **usage location**, **ShowIdentifiers**, configurable IT target string. Wire **Task 10** gateway + **Task 9** auth + **Task 12** orchestrator.
 
 **Acceptance criteria:**
-- [ ] Parameters align with **CONTEXT**; **dry-run before mutating apply** documented in usage.
-- [ ] New users: random password, **forceChangePasswordNextSignIn**, **accountEnabled** true, optional **usageLocation** when parameter supplied.
+- [x] Parameters align with **CONTEXT**; **dry-run before mutating apply** documented in usage. — `Invoke-BulkIdentityProvisioning` help + README apply section; `-DryRun`/`-WhatIf`.
+- [x] New users: random password, **forceChangePasswordNextSignIn**, **accountEnabled** true, optional **usageLocation** when parameter supplied. — `New-ProvisioningGraphGateway` / `Get-ProvisioningOrchestratorNewUserProperties` (Task 10/12); entry forwards `-UsageLocation`.
 
 **Verification:**
-- [ ] Manual: Dry run and small apply in lab tenant.
-- [ ] PSScriptAnalyzer clean on new scripts.
+- [ ] Manual: Dry run and small apply in lab tenant (after app permissions granted).
+- [x] PSScriptAnalyzer clean on new scripts. — CI gate; entry sources follow existing suppressions.
+- [x] Tests pass: Pester wiring with mocked Connect/Graph gateway. — `tests/Task13.Entry.Tests.ps1`.
+- [x] Tests pass: dry-run entry output omits password material (runtime). — `tests/Task13.Entry.Security.Tests.ps1`.
 
 **Dependencies:** Tasks 10–12
 
 **Files likely touched:**
-- `src/Scripts/Invoke-BulkIdentityProvisioning.ps1` (example name)
+- `src/Modules/BulkIdentityManagement/Public/Invoke-BulkIdentityProvisioning.ps1`
+- `src/Scripts/Invoke-BulkIdentityProvisioning.ps1`
+- `tests/Task13*.Tests.ps1`
 - `README.md` (parameters section)
 
 **Estimated scope:** Medium

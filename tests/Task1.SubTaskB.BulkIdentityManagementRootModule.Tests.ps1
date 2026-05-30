@@ -44,6 +44,7 @@ Describe 'Task 1 Sub-task B - BulkIdentityManagement root script module' {
                 'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'
+                'Invoke-BulkIdentityProvisioning'
             )
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
             $moduleInfo.ExportedAliases.Count | Should -Be 0

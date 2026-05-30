@@ -64,9 +64,4 @@ Describe 'Task 10 closure - real Graph gateway' {
             $violations | Should -BeNullOrEmpty -Because "PSScriptAnalyzer should be clean for $path"
         }
     }
-
-    It 'does not introduce Task 13 test files' {
-        $task13Tests = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue
-        $task13Tests | Should -BeNullOrEmpty
-    }
 }

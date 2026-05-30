@@ -40,9 +40,4 @@ Describe 'Task 9 Closure' {
         $violations = Invoke-ScriptAnalyzer -Path $srcFile -Severity Warning, Error
         $violations | Should -BeNullOrEmpty
     }
-
-    It 'does not introduce Task 13 test files' {
-        $task13Tests = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue
-        $task13Tests | Should -BeNullOrEmpty -Because 'Task 13 is out of scope for Task 9'
-    }
 }

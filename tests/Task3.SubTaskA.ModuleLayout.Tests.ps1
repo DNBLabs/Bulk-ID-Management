@@ -32,6 +32,11 @@ Describe 'Task 3 Sub-task A - BulkIdentityManagement CSV module layout' {
         Test-Path -LiteralPath $PrivateDir -PathType Container | Should -BeTrue
     }
 
+    It 'loads Private scripts only from phased subfolders, not loose Private/*.ps1 at module root' {
+        $rootPrivateScripts = @(Get-ChildItem -LiteralPath $PrivateDir -Filter '*.ps1' -File -ErrorAction SilentlyContinue)
+        $rootPrivateScripts.Count | Should -Be 0 -Because 'orphan root Private scripts are not dot-sourced by BulkIdentityManagement.psm1'
+    }
+
     It 'stores canonical CSV header names in Private/Csv/ProvisioningCsv.Constants.ps1' {
         Test-Path -LiteralPath $ConstantsPath -PathType Leaf | Should -BeTrue
     }

@@ -31,8 +31,29 @@ The Task 1 foundation is present: the `BulkIdentityManagement` module scaffold l
 
 ## Apply output hygiene
 
-Default console output from batch reporting omits passwords and avoids full **UPN** / object IDs. For lab debugging only, a future entry script will support **`-ShowIdentifiers`** (off by default) to print fuller identifiers; do not enable in production transcripts.
+Default console output from batch reporting omits passwords and avoids full **UPN** / object IDs. For lab debugging only, **`-ShowIdentifiers`** (off by default) prints fuller identifiers; do not enable in production transcripts.
+
+## Operator entry (Task 13)
+
+Dry-run before mutating apply: review the plan with **`-DryRun`** or **`-WhatIf`** before running apply without those switches. Dry-run still calls **`Connect-ProvisioningGraph`** (certificate auth to the automation principal); only directory mutations are suppressed.
+
+From the repository root (after placing a provisioning CSV and certificate credentials outside the repo):
+
+```powershell
+pwsh ./src/Scripts/Invoke-BulkIdentityProvisioning.ps1 `
+  -CsvPath ./path/to/users.csv `
+  -TenantId '<tenant-guid>' `
+  -ClientId '<app-guid>' `
+  -CertificateThumbprint '<40-char-hex-thumbprint>' `
+  -TenantDomainSuffix 'contoso.com' `
+  -ItMembershipGroupId '<it-group-object-id-guid>' `
+  -DryRun
+```
+
+Optional flags: **`-UpdateExisting`**, **`-UsageLocation`** (ISO alpha-2 for new users), **`-ItDepartmentTarget`** (default `IT`), **`-ShowIdentifiers`**. The script exits with a non-zero code when any row failed (**batch error policy**).
+
+The same surface is available after `Import-Module` as **`Invoke-BulkIdentityProvisioning`**.
 
 ## Not Yet Implemented Boundary
 
-CSV import, identity mapping, UPN derivation, certificate Graph auth, fake/real gateway slices, row outcomes, and fake-gateway orchestration are implemented in the module (see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)). The public operator entry script, full real-gateway apply, sample CSV, runbook, and lab checklist remain later tasks.
+Sample CSV, full runbook, optional GitHub apply workflow template, and lab integration checklist remain later tasks (see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)).

@@ -22,8 +22,8 @@ Describe 'Task 12 closure' {
         $plan | Should -Match '(?m)^- \[x\] \*\*IT membership ensure\*\* runs when user creation skipped but row qualifies'
     }
 
-    It 'does not introduce Task 13 test files' {
-        $task13 = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue
-        $task13 | Should -BeNullOrEmpty
+    It 'introduces Task 13 test files for the operator entry' {
+        $task13 = @(Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue)
+        $task13.Count | Should -BeGreaterThan 0
     }
 }

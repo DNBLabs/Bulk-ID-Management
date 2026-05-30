@@ -17,6 +17,7 @@ BeforeAll {
         'Get-MappedProvisioningIdentity'
         'Get-DerivedUserPrincipalName'
         'Connect-ProvisioningGraph'
+        'Invoke-BulkIdentityProvisioning'
     )
 }
 
@@ -48,6 +49,7 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
                 'Get-DerivedUserPrincipalName'
                 'Get-MappedProvisioningIdentity'
                 'Import-ProvisioningCsv'
+                'Invoke-BulkIdentityProvisioning'
             )
             $moduleInfo.ExportedCmdlets.Count | Should -Be 0
             $moduleInfo.ExportedAliases.Count | Should -Be 0
@@ -97,6 +99,7 @@ Describe 'Task 3 Sub-task G - BulkIdentityManagement export wiring' {
             'Get-DerivedUserPrincipalName'
             'Get-MappedProvisioningIdentity'
             'Import-ProvisioningCsv'
+            'Invoke-BulkIdentityProvisioning'
         )
     }
 }

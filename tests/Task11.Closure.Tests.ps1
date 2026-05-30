@@ -21,9 +21,4 @@ Describe 'Task 11 closure' {
         $plan | Should -Match '(?m)^- \[x\] \*\*ShowIdentifiers\*\* opt-in documented'
         $plan | Should -Match '(?m)^- \[x\] Exit code policy'
     }
-
-    It 'does not introduce Task 13 test files' {
-        $task13 = Get-ChildItem -Path (Join-Path -Path $script:RepoRoot -ChildPath 'tests') -Filter 'Task13*' -ErrorAction SilentlyContinue
-        $task13 | Should -BeNullOrEmpty
-    }
 }

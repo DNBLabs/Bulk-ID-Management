@@ -98,4 +98,5 @@ Export-ModuleMember -Function @(
     'Get-MappedProvisioningIdentity'
     'Get-DerivedUserPrincipalName'
     'Connect-ProvisioningGraph'
+    'Invoke-BulkIdentityProvisioning'
 )

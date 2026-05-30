@@ -74,6 +74,7 @@ Describe 'Task 1 Sub-task C - BulkIdentityManagement module manifest' {
             'Get-MappedProvisioningIdentity'
             'Get-DerivedUserPrincipalName'
             'Connect-ProvisioningGraph'
+            'Invoke-BulkIdentityProvisioning'
         )
         $data.CmdletsToExport.Count | Should -Be 0
         $data.AliasesToExport.Count | Should -Be 0
