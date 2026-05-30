@@ -30,6 +30,8 @@
 #>
 
 function New-ProvisioningRowOutcome {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '',
+        Justification = 'Constructs an in-memory outcome object; no external state change.')]
     [CmdletBinding()]
     [OutputType([pscustomobject])]
     param(

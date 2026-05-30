@@ -112,7 +112,7 @@ Describe 'Task 12 - Invoke-ProvisioningOrchestrator' {
                 -ProvisioningRow $row `
                 -MappedProvisioningIdentity $mapped `
                 -TenantDomainSuffix 'contoso.com' `
-                -UpnExists { param([string] $Upn) $false }
+                -UpnExists { param([string] $Upn) [void] $Upn; $false }
             $existingId = 'existing-user-id'
             $State.UpnIndex[$derived.UserPrincipalName.ToLowerInvariant()] = $existingId
             $State.Users[$existingId] = @{
@@ -147,7 +147,7 @@ Describe 'Task 12 - Invoke-ProvisioningOrchestrator' {
                 -ProvisioningRow $row `
                 -MappedProvisioningIdentity $mapped `
                 -TenantDomainSuffix 'contoso.com' `
-                -UpnExists { param([string] $Upn) $false }
+                -UpnExists { param([string] $Upn) [void] $Upn; $false }
             $existingId = 'existing-user-id'
             $State.UpnIndex[$derived.UserPrincipalName.ToLowerInvariant()] = $existingId
             $State.Users[$existingId] = @{
@@ -187,7 +187,7 @@ Describe 'Task 12 - Invoke-ProvisioningOrchestrator' {
                 -ProvisioningRow $row `
                 -MappedProvisioningIdentity $mapped `
                 -TenantDomainSuffix 'contoso.com' `
-                -UpnExists { param([string] $Upn) $false }
+                -UpnExists { param([string] $Upn) [void] $Upn; $false }
             $userId = 'existing-user-id'
             $State.UpnIndex[$derived.UserPrincipalName.ToLowerInvariant()] = $userId
             $State.Users[$userId] = @{

@@ -8,6 +8,8 @@
 #>
 
 function Invoke-ProvisioningGraphGatewayTestUpnExists {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
+        Justification = 'TestUpnExists matches the Task 7 gateway contract name in CONTEXT.md.')]
     [CmdletBinding()]
     [OutputType([string])]
     param(

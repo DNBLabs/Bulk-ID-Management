@@ -13,6 +13,8 @@
 #>
 
 function Get-ProvisioningOrchestratorUpdateProperties {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
+        Justification = 'Properties reflects a property bag returned for Graph UpdateUser.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(

@@ -11,6 +11,8 @@
 #>
 
 function New-ProvisioningGraphUserPassword {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '',
+        Justification = 'Generates an in-memory SecureString for Graph user creation; no external state change at construction.')]
     [CmdletBinding()]
     [OutputType([System.Security.SecureString])]
     param()
@@ -61,8 +63,13 @@ function New-ProvisioningGraphUserPassword {
                 "Password generation produced $($passwordChars.Count) characters; expected $targetPasswordLength.")
         }
 
-        $plain = [string]::new($passwordChars.ToArray())
-        return ConvertTo-SecureString -String $plain -AsPlainText -Force
+        $securePassword = [System.Security.SecureString]::new()
+        foreach ($char in $passwordChars) {
+            $securePassword.AppendChar($char)
+        }
+
+        $securePassword.MakeReadOnly()
+        return $securePassword
     }
     finally {
         if ($null -ne $rng) {

@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Closure tests for Task 10 Phase 3 (real Graph gateway builder + profile).
 

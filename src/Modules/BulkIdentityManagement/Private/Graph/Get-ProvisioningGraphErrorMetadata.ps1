@@ -14,6 +14,8 @@
 #>
 
 function Get-ProvisioningGraphErrorMetadata {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
+        Justification = 'Metadata describes structured error fields returned from Graph failures.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(

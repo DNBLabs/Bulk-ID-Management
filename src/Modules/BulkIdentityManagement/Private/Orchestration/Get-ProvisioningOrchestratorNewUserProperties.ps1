@@ -19,6 +19,8 @@
 #>
 
 function Get-ProvisioningOrchestratorNewUserProperties {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '',
+        Justification = 'Properties reflects a property bag returned for Graph NewUser.')]
     [CmdletBinding()]
     [OutputType([hashtable])]
     param(
