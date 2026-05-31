@@ -70,5 +70,16 @@ if (-not (Test-Path -LiteralPath $psm1Path -PathType Leaf)) {
 
 Import-Module -Name $psm1Path -Force -ErrorAction Stop
 
-$result = Invoke-BulkIdentityProvisioning @PSBoundParameters
+$commandOutput = @(Invoke-BulkIdentityProvisioning @PSBoundParameters)
+foreach ($item in $commandOutput) {
+    if ($item -is [string]) {
+        Write-Host $item
+    }
+}
+
+$result = $commandOutput[-1]
+if ($null -eq $result -or $result -isnot [pscustomobject]) {
+    throw [System.InvalidOperationException]::new('Bulk provisioning did not return a result object.')
+}
+
 exit $result.ExitCode

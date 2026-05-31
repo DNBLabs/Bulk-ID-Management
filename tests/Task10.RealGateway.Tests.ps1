@@ -134,9 +134,11 @@ Describe 'Task 10 - New-ProvisioningGraphGateway operations' {
         }
     }
 
-    It 'TestGroupMembership returns $false when member filter is empty' {
+    It 'TestGroupMembership returns $false when user is not in the group' {
         InModuleScope BulkIdentityManagement {
-            Mock Get-MgGroupMember { return @() }
+            Mock Invoke-MgGraphRequest {
+                return @{ value = @() }
+            }
 
             $gateway = New-ProvisioningGraphGateway
             $userId = '66666666-6666-6666-6666-666666666666'
@@ -144,16 +146,18 @@ Describe 'Task 10 - New-ProvisioningGraphGateway operations' {
             $result = & $gateway.TestGroupMembership $userId $groupId
 
             $result | Should -BeFalse
-            Should -Invoke Get-MgGroupMember -Times 1 -Exactly -ParameterFilter {
-                $Filter -eq "id eq '$userId'"
+            Should -Invoke Invoke-MgGraphRequest -Times 1 -Exactly -ParameterFilter {
+                $Method -eq 'POST' -and
+                $Uri -eq "https://graph.microsoft.com/v1.0/users/$userId/checkMemberGroups" -and
+                $Body.groupIds -contains $groupId
             }
         }
     }
 
     It 'AddGroupMember skips New-MgGroupMember when user is already a member' {
         InModuleScope BulkIdentityManagement {
-            Mock Get-MgGroupMember {
-                return @([pscustomobject]@{ Id = '88888888-8888-8888-8888-888888888888' })
+            Mock Invoke-MgGraphRequest {
+                return @{ value = @('99999999-9999-9999-9999-999999999999') }
             }
             Mock New-MgGroupMember {}
 

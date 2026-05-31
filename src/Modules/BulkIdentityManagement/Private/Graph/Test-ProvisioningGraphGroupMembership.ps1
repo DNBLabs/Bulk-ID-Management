@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Tests whether a user is a member of a group via Get-MgGroupMember filter.
+    Tests whether a user is a member of a group via Microsoft Graph checkMemberGroups.
 
 .PARAMETER UserId
     User Object ID (GUID).
@@ -26,17 +26,24 @@ function Test-ProvisioningGraphGroupMembership {
     Test-ProvisioningGraphObjectId -Id $UserId -ParameterName 'UserId'
     Test-ProvisioningGraphObjectId -Id $GroupId -ParameterName 'GroupId'
 
-    $members = Invoke-ProvisioningGraphCommand -OperationName 'TestGroupMembership' -Command {
-        Get-MgGroupMember -GroupId $GroupId -Filter "id eq '$UserId'" -Top 1 -ErrorAction Stop
+    $isMember = Invoke-ProvisioningGraphCommand -OperationName 'TestGroupMembership' -Command {
+        $uri = "https://graph.microsoft.com/v1.0/users/$UserId/checkMemberGroups"
+        $response = Invoke-MgGraphRequest -Method POST -Uri $uri -Body @{
+            groupIds = @($GroupId)
+        } -ErrorAction Stop
+
+        $matchingGroupIds = @()
+        if ($null -ne $response) {
+            if ($null -ne $response.Value) {
+                $matchingGroupIds = @($response.Value)
+            }
+            elseif ($null -ne $response.value) {
+                $matchingGroupIds = @($response.value)
+            }
+        }
+
+        return $matchingGroupIds -contains $GroupId
     }
 
-    if ($null -eq $members) {
-        return $false
-    }
-
-    if ($members -is [System.Array] -or $members -is [System.Collections.IList]) {
-        return @($members).Count -gt 0
-    }
-
-    return $true
+    return [bool]$isMember
 }

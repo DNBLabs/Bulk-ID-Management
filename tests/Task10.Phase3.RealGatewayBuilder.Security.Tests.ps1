@@ -61,7 +61,7 @@ Describe 'Task 10 Phase 3 - New-ProvisioningGraphGateway security' {
 
     It 'source pins Graph profile to v1.0 literal only' {
         $text = Get-Content -LiteralPath $script:SrcFile -Raw
-        $text | Should -Match "Select-MgProfile\s+-Name\s+'v1\.0'"
+        $text | Should -Match "-Name\s+'v1\.0'"
         $text | Should -Not -Match "Select-MgProfile\s+-Name\s+'beta'"
         $text | Should -Not -Match 'Select-MgProfile\s+-Name\s+\$'
     }

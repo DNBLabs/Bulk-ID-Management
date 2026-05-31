@@ -19,20 +19,21 @@ AfterAll {
 
 Describe 'Task 10 Phase 3 - New-ProvisioningGraphGateway builder' {
 
-    BeforeEach {
+    It 'returns six ScriptBlock operations when Select-MgProfile is unavailable (Graph SDK 2.x)' {
         InModuleScope BulkIdentityManagement {
-            function script:Select-MgProfile {
-                param(
-                    [Parameter(Mandatory)]
-                    [string] $Name
-                )
-                [void] $Name
-            }
+            $gateway = New-ProvisioningGraphGateway
+
+            $gateway | Should -BeOfType [hashtable]
+            $gateway.Keys.Count | Should -Be 6
         }
     }
 
-    It 'selects Graph v1.0 profile and returns six ScriptBlock operations' {
+    It 'selects Graph v1.0 profile when Select-MgProfile is available' {
         InModuleScope BulkIdentityManagement {
+            function script:Select-MgProfile {
+                param([Parameter(Mandatory)][string] $Name)
+                [void] $Name
+            }
             Mock Select-MgProfile {}
 
             $gateway = New-ProvisioningGraphGateway
@@ -57,6 +58,10 @@ Describe 'Task 10 Phase 3 - New-ProvisioningGraphGateway builder' {
 
     It 'wraps Select-MgProfile failure in InvalidOperationException' {
         InModuleScope BulkIdentityManagement {
+            function script:Select-MgProfile {
+                param([Parameter(Mandatory)][string] $Name)
+                [void] $Name
+            }
             Mock Select-MgProfile {
                 throw [System.InvalidOperationException]::new('Profile v1.0 is not available.')
             }

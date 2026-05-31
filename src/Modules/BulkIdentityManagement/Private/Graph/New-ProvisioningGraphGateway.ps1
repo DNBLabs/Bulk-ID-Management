@@ -7,8 +7,9 @@
     contract against Microsoft.Graph v1.0 cmdlets. Requires Connect-ProvisioningGraph
     to have established a session before calling this builder.
 
-    Selects Graph API profile v1.0 once at construction. Each operation delegates to
-    module-scoped gateway operation functions via function ScriptBlocks.
+    Selects Graph API profile v1.0 once at construction when Select-MgProfile is available
+    (Microsoft.Graph 2.x may omit this cmdlet; v1 is then the SDK default). Each operation
+    delegates to module-scoped gateway operation functions via function ScriptBlocks.
 
     See CONTEXT.md and PRD-Task-10-Real-Graph-Gateway.md.
 
@@ -26,13 +27,16 @@ function New-ProvisioningGraphGateway {
     [OutputType([hashtable])]
     param()
 
-    try {
-        Select-MgProfile -Name 'v1.0' -ErrorAction Stop
-    }
-    catch {
-        throw [System.InvalidOperationException]::new(
-            "Failed to select Microsoft Graph API profile 'v1.0'. Inspect InnerException for SDK details.",
-            $_.Exception)
+    $selectProfileCommand = Get-Command -Name 'Select-MgProfile' -ErrorAction SilentlyContinue
+    if ($null -ne $selectProfileCommand) {
+        try {
+            & $selectProfileCommand -Name 'v1.0' -ErrorAction Stop
+        }
+        catch {
+            throw [System.InvalidOperationException]::new(
+                "Failed to select Microsoft Graph API profile 'v1.0'. Inspect InnerException for SDK details.",
+                $_.Exception)
+        }
     }
 
     return @{
