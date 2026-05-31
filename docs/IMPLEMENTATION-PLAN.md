@@ -300,7 +300,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 - [x] **IT membership group** resolved by **Object ID** (no display-name-only fuzzy search). — `GetGroupById` / membership ops use `Get-MgGroup -GroupId` and GUID validation.
 
 **Verification:**
-- [ ] Manual: Run against lab tenant with small CSV (after Task 13 entry exists, or provisional script). Lab auth verified 2026-05-28; grant `User.ReadWrite.All`, `Group.Read.All`, `GroupMember.ReadWrite.All` before gateway smoke.
+- [x] Manual: Run against lab tenant with small CSV (after Task 13 entry exists, or provisional script). — Lab verified 2026-05-31 via `Invoke-BulkIdentityProvisioning` + `samples/provisioning-lab-dryrun.csv` (dry run, apply, IT membership ensure re-run).
 - [x] CI (Task 10 complete): All `tests/Task10*.Tests.ps1` green; mocked Graph cmdlets; no live tenant. — **42** tests (2026-05-28). PSScriptAnalyzer **0** on gateway + retry source (closure-checked).
 
 **Dependencies:** Tasks 7, 9
@@ -376,7 +376,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 
 ### Phase 4: Entry point and live gateway wiring
 
-**Phase status (2026-05-30):** **Task 13 complete** (operator entry + live gateway wiring). Pester covers wiring with mocked Graph; lab dry run/apply remains manual.
+**Phase status (2026-05-31):** **Task 13 complete** (operator entry + live gateway wiring). Lab dry run and apply verified manually in examlab802 tenant.
 
 | Task | Focus | Status |
 |------|--------|--------|
@@ -396,7 +396,7 @@ Foundation tasks (1–3) unblock all logic; **Tasks 4–6** can proceed in paral
 - [x] New users: random password, **forceChangePasswordNextSignIn**, **accountEnabled** true, optional **usageLocation** when parameter supplied. — `New-ProvisioningGraphGateway` / `Get-ProvisioningOrchestratorNewUserProperties` (Task 10/12); entry forwards `-UsageLocation`.
 
 **Verification:**
-- [ ] Manual: Dry run and small apply in lab tenant (after app permissions granted).
+- [x] Manual: Dry run and small apply in lab tenant (after app permissions granted). — Lab verified 2026-05-31: PFX auth, dry run (`Created=3`), apply (3 users + Grace IT group membership), idempotent re-run (`Skipped` / `MembershipEnsured`).
 - [x] PSScriptAnalyzer clean on new scripts. — CI gate; entry sources follow existing suppressions.
 - [x] Tests pass: Pester wiring with mocked Connect/Graph gateway. — `tests/Task13.Entry.Tests.ps1`.
 - [x] Tests pass: dry-run entry output omits password material (runtime). — `tests/Task13.Entry.Security.Tests.ps1`.

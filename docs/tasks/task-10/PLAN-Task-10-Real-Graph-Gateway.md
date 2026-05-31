@@ -136,7 +136,7 @@ tests mock Graph cmdlets; no network in default pipelines.
 
   - [x] IT membership group resolved by Object ID only.
 
-- [ ] Manual lab smoke documented (optional until app permissions granted): connect → `New-ProvisioningGraphGateway` → `TestUpnExists` / small operation.
+- [x] Manual lab smoke documented (optional until app permissions granted): connect → `New-ProvisioningGraphGateway` → `TestUpnExists` / small operation. — Covered by 2026-05-31 Task 13 lab path through full entry script and CSV apply.
 
 
 
