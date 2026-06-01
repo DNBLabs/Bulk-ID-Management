@@ -1,0 +1,45 @@
+# Optional tenant-mutating path (CONTEXT / SEC): manual workflow_dispatch only.
+# Default PR CI (.github/workflows/ci.yml) remains validate-only (PSScriptAnalyzer + Pester).
+#
+# Before enabling:
+# - Create GitHub Environment "entra-apply" with required reviewers (SEC §A).
+# - Register federated credential on the automation principal with OIDC subject:
+#     repo:<GitHubOrg>/<GitHubRepo>:environment:entra-apply
+#   Issuer: https://token.actions.githubusercontent.com
+#   See docs/Design/SEC.md (OIDC subject mapping table).
+# - Store tenant/app/certificate secrets in the environment (not in the repository).
+#
+# This file is a placeholder: replace the stub job with Invoke-BulkIdentityProvisioning wiring
+# when the organization chooses GitHub-hosted apply over local certificate apply.
+
+name: Apply (manual dispatch placeholder)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview only (no directory mutations)'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  apply-placeholder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: entra-apply
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Placeholder — tenant apply not implemented in CI template
+        run: |
+          Write-Output 'This workflow is a manual-only template. Configure entra-apply environment, OIDC per SEC.md, and replace this step with provisioning entry wiring.'
+          Write-Output "workflow_dispatch dry_run input: ${{ inputs.dry_run }}"
