@@ -73,7 +73,7 @@ Import-Module -Name $psm1Path -Force -ErrorAction Stop
 $commandOutput = @(Invoke-BulkIdentityProvisioning @PSBoundParameters)
 foreach ($item in $commandOutput) {
     if ($item -is [string]) {
-        Write-Host $item
+        Write-Output $item
     }
 }
 
