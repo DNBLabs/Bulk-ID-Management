@@ -11,6 +11,8 @@ This README is a landing page for the project documents. `CONTEXT.md` wins on co
 - Infrastructure design: [docs/Design/IDD.md](docs/Design/IDD.md)
 - Security and compliance profile: [docs/Design/SEC.md](docs/Design/SEC.md)
 - Implementation task order: [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)
+- Operator runbook: [docs/runbook.md](docs/runbook.md)
+- Lab integration checklist (non-CI): [docs/lab-integration-checklist.md](docs/lab-integration-checklist.md)
 - Background only, not a behavioral contract: [docs/init-project.txt](docs/init-project.txt)
 
 ## CI Scope vs Apply Path
@@ -19,41 +21,42 @@ CI scope is validate-only: default CI validation gates run local checks such as 
 
 Tenant mutation belongs to the explicit apply path, primarily from a local or controlled runner using documented authentication. Operators must perform dry-run before mutating apply so the plan can be reviewed before any directory changes.
 
+### Default CI (local or GitHub)
+
+From the repository root with **PowerShell 7** (`pwsh`):
+
+```powershell
+./.github/scripts/Invoke-PSScriptAnalyzerCI.ps1
+Invoke-Pester -Path ./tests -CI
+./.github/scripts/Invoke-ModuleManifestCI.ps1
+```
+
+GitHub Actions runs the same gates in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) on `push` and `pull_request` to `main`. PSScriptAnalyzer fails the build on **Error** and **Warning** severities for `.ps1` / `.psm1` under `src`, `tests`, and `.github/scripts`.
+
+### Optional manual apply workflow (template)
+
+A separate, tenant-mutating workflow template lives at [`.github/workflows/apply-dispatch-placeholder.yml`](.github/workflows/apply-dispatch-placeholder.yml). It is triggered only by **`workflow_dispatch`**, targets the **`entra-apply`** GitHub Environment (configure **required reviewers**), and is not part of default PR validation.
+
+Register the automation principal federated credential with OIDC subject `repo:<GitHubOrg>/<GitHubRepo>:environment:entra-apply` per [docs/Design/SEC.md](docs/Design/SEC.md). Replace the placeholder job with provisioning entry wiring when GitHub-hosted apply is required.
+
 ## Credential Safety
 
 Local apply authentication uses certificate-based client credentials for the automation principal. Certificate material and private key material stay outside the repository, and a client secret is not the default path.
 
 ## Current Implementation Status
 
-Implementation is in progress; see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md) for task status.
+v1 implementation tasks (foundation through lab hardening) are complete per [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md). The `BulkIdentityManagement` module lives under `src/Modules/BulkIdentityManagement/`, targets PowerShell 7.2+ with 7.4+ preferred, and pins `Microsoft.Graph` through the repository module manifest.
 
-The Task 1 foundation is present: the `BulkIdentityManagement` module scaffold lives under `src/Modules/BulkIdentityManagement/`, targets PowerShell 7.2+ with 7.4+ preferred, and pins `Microsoft.Graph` through the repository module manifest rather than a floating dependency policy.
+Committed sample data: [samples/provisioning-sample.csv](samples/provisioning-sample.csv). Step-by-step tenant work: [docs/runbook.md](docs/runbook.md).
 
 ## Apply output hygiene
 
 Default console output from batch reporting omits passwords and avoids full **UPN** / object IDs. For lab debugging only, **`-ShowIdentifiers`** (off by default) prints fuller identifiers; do not enable in production transcripts.
 
-## Operator entry (Task 13)
+## Operator entry
 
-Dry-run before mutating apply: review the plan with **`-DryRun`** or **`-WhatIf`** before running apply without those switches. Dry-run still calls **`Connect-ProvisioningGraph`** (certificate auth to the automation principal); only directory mutations are suppressed.
+Dry-run before mutating apply. Full prerequisites, dry-run and apply commands, row outcomes, and **batch error policy** exit semantics: [docs/runbook.md](docs/runbook.md).
 
-From the repository root (after placing a provisioning CSV and certificate credentials outside the repo):
+Entry script: `src/Scripts/Invoke-BulkIdentityProvisioning.ps1` (or **`Invoke-BulkIdentityProvisioning`** after `Import-Module`). Human lab verification: [docs/lab-integration-checklist.md](docs/lab-integration-checklist.md).
 
-```powershell
-pwsh ./src/Scripts/Invoke-BulkIdentityProvisioning.ps1 `
-  -CsvPath ./path/to/users.csv `
-  -TenantId '<tenant-guid>' `
-  -ClientId '<app-guid>' `
-  -CertificateThumbprint '<40-char-hex-thumbprint>' `
-  -TenantDomainSuffix 'contoso.com' `
-  -ItMembershipGroupId '<it-group-object-id-guid>' `
-  -DryRun
-```
-
-Optional flags: **`-UpdateExisting`**, **`-UsageLocation`** (ISO alpha-2 for new users), **`-ItDepartmentTarget`** (default `IT`), **`-ShowIdentifiers`**. The script exits with a non-zero code when any row failed (**batch error policy**).
-
-The same surface is available after `Import-Module` as **`Invoke-BulkIdentityProvisioning`**.
-
-## Not Yet Implemented Boundary
-
-Sample CSV, full runbook, optional GitHub apply workflow template, and lab integration checklist remain later tasks (see [docs/IMPLEMENTATION-PLAN.md](docs/IMPLEMENTATION-PLAN.md)).
+The optional GitHub apply workflow remains a **placeholder** until `entra-apply` environment secrets and OIDC are configured (see CI section above).
